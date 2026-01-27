@@ -4,7 +4,6 @@ import com.example.backend.Enum.Role;
 import com.example.backend.Enum.SubscriptionType;
 import com.example.backend.Enum.UserStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +24,7 @@ public class User {
     private Long id;
     @Column(length = 30, nullable = false)
     private String email;
-    @Column(length = 50, nullable = false)
+    @Column(length = 60, nullable = false)
     private String password;
     @Column(name = "display_name", length = 20, nullable = false)
     private String displayName;
