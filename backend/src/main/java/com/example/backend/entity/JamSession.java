@@ -1,0 +1,63 @@
+package com.example.backend.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "jam_session")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class JamSession {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "session_code", unique = true, nullable = false)
+    private String sessionCode;
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
+
+    @OneToOne(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "owner_id")
+    private Member owner;
+
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<JamParticipant> participants;
+
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(name = "current_track_id")
+    private Track currentTrack;
+
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(name = "context_playlist_id")
+    private Playlist contextPlaylist;
+
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(name = "context_album_id")
+    private Album contextAlbum;
+}
