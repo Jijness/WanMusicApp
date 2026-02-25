@@ -50,4 +50,12 @@ public class ArtistProfile {
             cascade = CascadeType.ALL
     )
     private List<ArtistContribution> contributions;
+
+    @OneToMany(
+            mappedBy = "artist",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Follower> followers;
 }

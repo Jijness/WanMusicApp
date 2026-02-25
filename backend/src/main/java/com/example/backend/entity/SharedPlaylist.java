@@ -32,7 +32,7 @@ public class SharedPlaylist {
     @JoinColumn(name = "memberId")
     private Member sharedMember;
 
-    SharedPlaylist(Playlist playlist, Member member){
+    public SharedPlaylist(Playlist playlist, Member member){
         this.playlist = playlist;
         this.sharedMember = member;
         this.id = new SharedPlaylistId(playlist.getId(), member.getId());

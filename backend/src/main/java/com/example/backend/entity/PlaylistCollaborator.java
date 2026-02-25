@@ -34,7 +34,7 @@ public class PlaylistCollaborator {
     @JoinColumn(name = "collaborator_id")
     private Member collaborator;
 
-    PlaylistCollaborator(Playlist playlist, Member collaborator){
+    public PlaylistCollaborator(Playlist playlist, Member collaborator){
         this.playlist = playlist;
         this.collaborator = collaborator;
         this.id = new PlaylistCollabId(playlist.getId(), collaborator.getId());

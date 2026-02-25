@@ -29,7 +29,7 @@ public class AlbumTrack {
     @JoinColumn(name = "track_id")
     private Track track;
 
-    AlbumTrack(Album album, Track track, int position){
+    public AlbumTrack(Album album, Track track, int position){
         this.album = album;
         this.track = track;
         this.id = new AlbumTrackId(album.getId(), track.getId());

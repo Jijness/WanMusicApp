@@ -107,4 +107,12 @@ public class Member extends User{
     )
     @JoinColumn(name = "jam_notification_id")
     private JamNotification jamNotification;
+
+    @OneToMany(
+            mappedBy = "follower",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Follower> artistsFollowed;
 }

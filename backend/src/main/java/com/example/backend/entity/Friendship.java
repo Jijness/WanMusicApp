@@ -40,7 +40,7 @@ public class Friendship {
     @JoinColumn(name = "friend_id", nullable = false)
     private Member friend;
 
-    Friendship(Member member, Member friend){
+    public Friendship(Member member, Member friend){
         this.member = member;
         this.friend = friend;
         this.id = new FriendshipId(member.getId(), friend.getId());

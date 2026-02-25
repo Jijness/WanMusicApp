@@ -2,7 +2,6 @@ package com.example.backend.entity;
 
 import com.example.backend.entity.EmbeddedId.UserTagPreferenceId;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,7 +28,7 @@ public class UserTagPreference {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-     UserTagPreference(Member member, Tag tag, int score){
+     public UserTagPreference(Member member, Tag tag, int score){
         this.member = member;
         this.tag = tag;
         this.score = score;

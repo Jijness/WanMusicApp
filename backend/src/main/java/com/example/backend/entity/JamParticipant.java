@@ -27,7 +27,7 @@ public class JamParticipant {
     @JoinColumn(name = "member_id")
     private Member participant;
 
-    JamParticipant(JamSession session, Member participant){
+    public JamParticipant(JamSession session, Member participant){
         this.session = session;
         this.participant = participant;
         this.id = new JamParticipantId(session.getId(), participant.getId());

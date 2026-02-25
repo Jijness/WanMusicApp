@@ -28,7 +28,7 @@ public class TrackTag {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-    TrackTag(Track track, Tag tag){
+    public TrackTag(Track track, Tag tag){
         this.track = track;
         this.tag = tag;
         this.id = new TrackTagId(track.getId(), tag.getId());
