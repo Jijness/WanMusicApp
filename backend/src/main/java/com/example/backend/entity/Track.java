@@ -21,8 +21,10 @@ public class Track {
     private Long id;
     @Column(length = 50, nullable = false)
     private String title;
-    @Column(name = "thumbnail_url",length = 150, nullable = false)
-    private String thumbnailUrl;
+    @Column(name = "thumbnail_key",length = 50, nullable = false)
+    private String thumbnailKey;
+    @Column(name = "file_key", length = 50, nullable = false)
+    private String fileKey;
     @Column(nullable = false)
     private int duration;
     @Enumerated(EnumType.STRING)
@@ -84,4 +86,12 @@ public class Track {
             orphanRemoval = true
     )
     private List<PlayerState> playerStates;
+
+    @OneToMany(
+            mappedBy = "currentTrack",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<JamSession> jamSessions;
 }

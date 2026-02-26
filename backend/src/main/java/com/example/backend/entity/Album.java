@@ -22,8 +22,8 @@ public class Album {
     private Long id;
     @Column(length = 50, nullable = false)
     private String title;
-    @Column(name = "cover_url", length = 150, nullable = false)
-    private String coverUrl;
+    @Column(name = "thumbnail_key", length = 50, nullable = false)
+    private String thumbnailKey;
     @Column(name = "realease_date", nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate realeaseDate;
@@ -50,4 +50,12 @@ public class Album {
             orphanRemoval = true
     )
     private List<PlayerState> playerStates;
+
+    @OneToMany(
+            mappedBy = "contextAlbum",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<JamSession> jamSessions;
 }

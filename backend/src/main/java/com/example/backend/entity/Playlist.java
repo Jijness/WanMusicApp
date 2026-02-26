@@ -21,6 +21,8 @@ public class Playlist {
     private Long id;
     @Column(length = 50, nullable = false)
     private String title;
+    @Column(name = "thumbnail_key", length = 50, nullable = false)
+    private String thumbnailKey;
     @Column(name = "is_public", nullable = false)
     private boolean isPublic;
 
@@ -42,6 +44,14 @@ public class Playlist {
             orphanRemoval = true
     )
     private List<SharedPlaylist> sharedPlaylists;
+
+    @OneToMany(
+            mappedBy = "contextPlaylist",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<JamSession> jamSessions;
 
     @OneToMany(
             mappedBy = "playlist",

@@ -6,16 +6,22 @@ import com.example.backend.Enum.UserStatus;
 import com.example.backend.dto.authentication.LogInRequest;
 import com.example.backend.dto.authentication.RegisterRequest;
 import com.example.backend.dto.authentication.AuthenticationResponse;
+import com.example.backend.entity.ArtistProfile;
+import com.example.backend.entity.Member;
 import com.example.backend.entity.Token;
 import com.example.backend.entity.User;
+import com.example.backend.repository.MemberRepository;
 import com.example.backend.repository.TokenRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtTokenProvider;
+import com.example.backend.security.UserPrinciple;
 import com.example.backend.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,6 +38,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
     private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepo;
+    private final MemberRepository memberRepo;
     private final TokenRepository tokenRepo;
     private final PasswordEncoder passwordEncoder;
 
@@ -55,7 +62,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
         saveToken(request.getEmail(), accessToken, refreshToken);
 
-        userRepo.updateUserStatus(request.getEmail(), UserStatus.ONLINE);
+        memberRepo.updateUserStatus(request.getEmail(), UserStatus.ONLINE);
 
         return new AuthenticationResponse(accessToken, refreshToken, "Logged in successfully!");
     }
@@ -70,9 +77,6 @@ public class AuthenticationServiceImp implements AuthenticationService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
-        user.setStatus(UserStatus.ONLINE);
-        user.setDisplayName(request.getDisplayName());
-        user.setSubscriptionType(SubscriptionType.FREE);
         user.setRole(Role.USER);
 
         userRepo.save(user);
@@ -85,6 +89,12 @@ public class AuthenticationServiceImp implements AuthenticationService {
         saveToken(request.getEmail(), accessToken, refreshToken);
 
         return new AuthenticationResponse(accessToken, refreshToken, "Account created successfully!");
+    }
+
+    public Long getCurrentMember(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+        return userPrinciple.getId();
     }
 
     private void saveToken(String email, String accessToken, String refreshToken){

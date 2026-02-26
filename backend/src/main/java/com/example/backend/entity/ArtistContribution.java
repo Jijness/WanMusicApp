@@ -1,8 +1,8 @@
 package com.example.backend.entity;
 
+import com.example.backend.Enum.ContributorRole;
 import com.example.backend.entity.EmbeddedId.ArtistContributionId;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +32,10 @@ public class ArtistContribution {
     @MapsId("artistId")
     @JoinColumn(name = "artist_id")
     private ArtistProfile contributor;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ContributorRole role;
 
     ArtistContribution(Track track, ArtistProfile contributor){
         this.track = track;
