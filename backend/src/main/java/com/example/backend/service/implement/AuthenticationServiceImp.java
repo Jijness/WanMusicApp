@@ -14,6 +14,7 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtTokenProvider;
 import com.example.backend.security.UserPrinciple;
 import com.example.backend.service.AuthenticationService;
+import com.example.backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -43,24 +44,24 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @Transactional
     @Override
     public AuthenticationResponse login(LogInRequest request) {
-        if(userRepo.findByEmail(request.getEmail()).isEmpty()){
+        if(userRepo.findByEmail(request.email()).isEmpty()){
             return new AuthenticationResponse(null, null, "Account not found!");
         }
 
         try{
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         }catch (BadCredentialsException e){
             return new AuthenticationResponse(null, null, "Invalid credentials!");
         }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
 
         String accessToken = jwtTokenProvider.generateAccessToken(userDetails);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
 
-        saveToken(request.getEmail(), accessToken, refreshToken);
+        saveToken(request.email(), accessToken, refreshToken);
 
-        memberRepo.updateUserStatus(request.getEmail(), UserStatus.ONLINE);
+        memberRepo.updateUserStatus(request.email(), UserStatus.ONLINE);
 
         return new AuthenticationResponse(accessToken, refreshToken, "Logged in successfully!");
     }
@@ -68,32 +69,33 @@ public class AuthenticationServiceImp implements AuthenticationService {
     @Transactional
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
-        if(userRepo.findByEmail(request.getEmail()).isPresent()){
+        if(userRepo.findByEmail(request.email()).isPresent()){
             return new AuthenticationResponse(null, null, "Account already exists!");
         }
         Member member = new Member();
-        member.setEmail(request.getEmail());
-        member.setPassword(passwordEncoder.encode(request.getPassword()));
+        member.setEmail(request.email());
+        member.setPassword(passwordEncoder.encode(request.password()));
         member.setCreatedAt(LocalDateTime.now());
         member.setRole(Role.USER);
         member.setSubscriptionType(SubscriptionType.FREE);
-        member.setFullName(request.getDisplayName());
+        member.setFullName(request.displayName());
         member.setStatus(UserStatus.ONLINE);
         member.setAvatarKey("avatar.png");
 
-        userRepo.save(member);
+        memberRepo.save(member);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
 
         String accessToken = jwtTokenProvider.generateAccessToken(userDetails);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
 
-        saveToken(request.getEmail(), accessToken, refreshToken);
+        saveToken(request.email(), accessToken, refreshToken);
 
         return new AuthenticationResponse(accessToken, refreshToken, "Account created successfully!");
     }
 
-    public Long getCurrentMember(){
+    @Override
+    public Long getCurrentMemberId(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
         return userPrinciple.getId();

@@ -1,15 +1,12 @@
 package com.example.backend.dto.track;
 
-import lombok.Data;
-
 import java.util.Set;
 
-@Data
-public class TrackCreateDraftDTO {
-    private String title;
-    private String trackKey;
-    private String thumbnailKey;
-    private int duration;
-    private Set<Long> tagIds;
-    private Set<Long> featuredArtistIds;
-}
+public record TrackCreateDraftDTO (
+        String title,
+        String trackKey,
+        String thumbnailKey,
+        int duration,
+        Set<Long> tagIds,
+        Set<Long> featuredArtistIds
+){}

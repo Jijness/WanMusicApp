@@ -16,11 +16,12 @@ public abstract class ArtistProfileMapper {
     private S3StorageService s3StorageService;
 
     @Mapping(source = "stageName", target = "name")
-    @Mapping(source = "avatarKey", target = "avatarUrl", qualifiedByName = "mapKeyToUrl")
+    @Mapping(source = "avatarKey", target = "avatarUrl", qualifiedByName = "mapAvatarKeyToUrl")
     public abstract UserPreviewDTO toPreviewDTO(ArtistProfile artistProfile);
 
     @Mapping(source = "avatarKey", target = "avatarUrl", qualifiedByName = "mapAvatarKeyToUrl")
     @Mapping(source = "coverKey", target = "coverUrl", qualifiedByName = "mapCoverKeyToUrl")
+    @Mapping(target = "albums", ignore = true)
     public abstract ArtistProfileDTO toArtistProfileDTO(ArtistProfile artistProfile);
 
     @Named("mapAvatarKeyToUrl")

@@ -84,12 +84,12 @@ public class S3StorageServiceImp implements S3StorageService {
 
     @Override
     public PresignedUploadResponseDTO getPutPresignedUrl(PresignedUploadRequestDTO request) {
-        String key = UUID.randomUUID() + "_" + request.getFileName().replace("\\s+", "").trim();
+        String key = UUID.randomUUID() + "_" + request.fileName().replace("\\s+", "").trim();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(request.getBucketName())
+                .bucket(request.bucketName())
                 .key(key)
-                .contentType(request.getFileType())
+                .contentType(request.fileType())
                 .build();
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
@@ -99,10 +99,6 @@ public class S3StorageServiceImp implements S3StorageService {
 
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
 
-        PresignedUploadResponseDTO presignedUploadResponseDTO = new PresignedUploadResponseDTO();
-        presignedUploadResponseDTO.setUrl(presignedRequest.url().toString());
-        presignedUploadResponseDTO.setKey(key);
-
-        return presignedUploadResponseDTO;
+        return new PresignedUploadResponseDTO(presignedRequest.url().toString(), key);
     }
 }

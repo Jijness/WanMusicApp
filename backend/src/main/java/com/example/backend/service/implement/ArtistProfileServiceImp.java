@@ -2,12 +2,12 @@ package com.example.backend.service.implement;
 
 import com.example.backend.dto.user.ArtistProfileDTO;
 import com.example.backend.dto.user.UserUpdateProfileDTO;
-import com.example.backend.entity.Album;
 import com.example.backend.entity.ArtistProfile;
 import com.example.backend.mapper.ArtistProfileMapper;
 import com.example.backend.repository.ArtistProfileRepository;
 import com.example.backend.service.AlbumService;
 import com.example.backend.service.ArtistProfileService;
+import com.example.backend.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,7 @@ public class ArtistProfileServiceImp implements ArtistProfileService {
     private final ArtistProfileMapper artistProfileMapper;
     private final AlbumService albumService;
     private final ArtistProfileRepository artistProfileRepo;
-    private final AuthenticationServiceImp authenticationService;
+    private final AuthenticationService authenticationService;
 
     @Override
     public ArtistProfileDTO getProfile(Long artistId) {
@@ -32,12 +32,12 @@ public class ArtistProfileServiceImp implements ArtistProfileService {
     @Override
     @Transactional
     public String updateProfile(UserUpdateProfileDTO dto) {
-        Long currentUserId = authenticationService.getCurrentMember();
+        Long currentUserId = authenticationService.getCurrentMemberId();
 
         ArtistProfile profile = artistProfileRepo.findByMemberId(currentUserId).orElseThrow(()-> new RuntimeException("Artist profile not found!"));
 
-        profile.setAvatarKey(dto.getAvatarKey());
-        profile.setStageName(dto.getDisplayName());
+        profile.setAvatarKey(dto.avatarKey());
+        profile.setStageName(dto.displayName());
         return "Profile updated successfully!";
     }
 }

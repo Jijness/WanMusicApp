@@ -12,6 +12,7 @@ public class ArtistProfileDTO {
     private Long id;
     private String stageName;
     private String avatarUrl;
+    private String coverUrl;
     private int followerCount;
     private List<TrackDTO> popularTracks;
     private PageResponse<AlbumDTO> albums;

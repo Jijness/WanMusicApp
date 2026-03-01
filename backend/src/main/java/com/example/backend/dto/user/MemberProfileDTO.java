@@ -1,6 +1,6 @@
 package com.example.backend.dto.user;
 
-import com.example.backend.dto.PlaylistPreviewDTO;
+import com.example.backend.dto.playlist.PlaylistPreviewDTO;
 import lombok.Data;
 
 import java.util.List;

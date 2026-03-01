@@ -4,12 +4,9 @@ import com.example.backend.dto.user.MemberProfileDTO;
 import com.example.backend.dto.user.UserUpdateProfileDTO;
 import com.example.backend.entity.Member;
 import com.example.backend.mapper.MemberMapper;
-import com.example.backend.repository.ArtistProfileRepository;
+import com.example.backend.repository.MemberRepository;
 import com.example.backend.repository.UserRepository;
-import com.example.backend.service.FollowerService;
-import com.example.backend.service.FriendshipService;
-import com.example.backend.service.MemberService;
-import com.example.backend.service.PlaylistService;
+import com.example.backend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,28 +16,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberServiceImp implements MemberService {
 
     private final MemberMapper memberMapper;
-    private final UserRepository userRepo;
-    private final AuthenticationServiceImp authenticationService;
+    private final MemberRepository memberRepo;
+    private final AuthenticationService authenticationService;
     private final FollowerService followerService;
     private final PlaylistService playlistService;
     private final FriendshipService friendshipService;
 
-
     @Override
     @Transactional
     public String updateProfile(UserUpdateProfileDTO dto) {
-        Long currentUserId = authenticationService.getCurrentMember();
+        Long currentUserId = authenticationService.getCurrentMemberId();
 
-        Member currentMember = (Member) userRepo.findById(currentUserId).orElseThrow(()-> new RuntimeException("Member not found!")) ;
+        Member currentMember = memberRepo.findById(currentUserId).orElseThrow(()-> new RuntimeException("Member not found!")) ;
 
-        currentMember.setAvatarKey(dto.getAvatarKey());
-        currentMember.setFullName(dto.getDisplayName());
+        currentMember.setAvatarKey(dto.avatarKey());
+        currentMember.setFullName(dto.displayName());
         return "Profile updated successfully!";
     }
 
     @Override
     public MemberProfileDTO getProfile(Long memberId) {
-        Member member = (Member) userRepo.findById(memberId).orElseThrow(() -> new RuntimeException("Member not found!"));
+        Member member = memberRepo.findById(memberId).orElseThrow(() -> new RuntimeException("Member not found!"));
 
         MemberProfileDTO memberProfileDTO = memberMapper.toProfileDTO(member);
 

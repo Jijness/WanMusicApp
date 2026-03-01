@@ -32,23 +32,23 @@ public class TrackServiceImp implements TrackService {
     @Transactional
     public TrackDraftResponseDTO createDraft(TrackCreateDraftDTO dto) {
         Track track = new Track();
-        track.setTitle(dto.getTitle());
-        track.setFileKey(dto.getTrackKey());
-        track.setThumbnailKey(dto.getThumbnailKey());
-        track.setDuration(dto.getDuration());
+        track.setTitle(dto.title());
+        track.setFileKey(dto.trackKey());
+        track.setThumbnailKey(dto.thumbnailKey());
+        track.setDuration(dto.duration());
         track.setStatus(TrackStatus.DRAFT);
         track.setCreatedAt(LocalDateTime.now());
 
         trackRepo.save(track);
 
-        List<TrackTag> tags = tagRepo.findAllById(dto.getTagIds())
+        List<TrackTag> tags = tagRepo.findAllById(dto.tagIds())
                 .stream()
                 .map(tag -> new TrackTag(
                         track,
                         tag
                 ))
                 .toList();
-        List<ArtistContribution> featuredArtists = artistProfileRepo.findAllById(dto.getFeaturedArtistIds())
+        List<ArtistContribution> featuredArtists = artistProfileRepo.findAllById(dto.featuredArtistIds())
                 .stream()
                 .map(artist -> new ArtistContribution(
                         track,
@@ -65,17 +65,17 @@ public class TrackServiceImp implements TrackService {
     @Override
     @Transactional
     public String submitTrack(TrackSubmitDTO dto) {
-        Track track = trackRepo.findById(dto.getId()).orElseThrow(()-> new RuntimeException("Track not found!"));
+        Track track = trackRepo.findById(dto.id()).orElseThrow(()-> new RuntimeException("Track not found!"));
         if(track.getStatus() != TrackStatus.DRAFT) throw new RuntimeException("Track is not in draft status!");
 
         track.getTags().clear();
-        List<Tag> tags = tagRepo.findAllById(dto.getTagIds());
+        List<Tag> tags = tagRepo.findAllById(dto.tagIds());
         for(Tag tag : tags){
             track.getTags().add(new TrackTag(track, tag));
         }
 
         track.getContributions().clear();
-        List<ArtistProfile> contributors = artistProfileRepo.findAllById(dto.getArtistIds());
+        List<ArtistProfile> contributors = artistProfileRepo.findAllById(dto.artistIds());
         for(ArtistProfile contributor : contributors){
             track.getContributions().add(new ArtistContribution(track, contributor));
         }

@@ -1,6 +1,6 @@
 package com.example.backend.mapper;
 
-import com.example.backend.dto.PlaylistPreviewDTO;
+import com.example.backend.dto.playlist.PlaylistPreviewDTO;
 import com.example.backend.entity.Playlist;
 import com.example.backend.service.S3StorageService;
 import org.mapstruct.Mapper;

@@ -1,9 +1,6 @@
 package com.example.backend.dto;
 
-import lombok.Data;
-
-@Data
-public class PresignedUploadResponseDTO {
-    private String url;
-    private String key;
-}
+public record PresignedUploadResponseDTO (
+        String url,
+        String key
+){}

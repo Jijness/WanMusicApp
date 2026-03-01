@@ -23,6 +23,8 @@ public class Playlist {
     private String title;
     @Column(name = "thumbnail_key", length = 50, nullable = false)
     private String thumbnailKey;
+    @Column(length = 200)
+    private String description;
     @Column(name = "is_public", nullable = false)
     private boolean isPublic;
 
