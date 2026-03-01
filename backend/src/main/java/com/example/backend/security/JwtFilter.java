@@ -43,14 +43,14 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         }catch(Exception e){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
             if(e instanceof ExpiredJwtException){
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json");
-                response.getWriter().write("AccessToken expired!");
-            }else if(e instanceof SignatureException){
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json");
-                response.getWriter().write("AccessToken unauthorized!");
+                response.getWriter().write("{\"error\": \"AccessToken expired!\"}");
+            } else if(e instanceof SignatureException){
+                response.getWriter().write("{\"error\": \"AccessToken signature invalid!\"}");
+            } else {
+                response.getWriter().write("{\"error\": \"Token invalid or malformed!\"}");
             }
             return;
         }

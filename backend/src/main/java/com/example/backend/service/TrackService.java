@@ -1,7 +1,10 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.track.TrackCreateDraftDTO;
+import com.example.backend.dto.track.TrackDraftResponseDTO;
+import com.example.backend.dto.track.TrackSubmitDTO;
 
 public interface TrackService {
-    Long createDraft(TrackCreateDraftDTO dto);
+    TrackDraftResponseDTO createDraft(TrackCreateDraftDTO dto);
+    String submitTrack(TrackSubmitDTO dto);
 }

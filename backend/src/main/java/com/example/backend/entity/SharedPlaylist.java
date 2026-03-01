@@ -35,6 +35,5 @@ public class SharedPlaylist {
     public SharedPlaylist(Playlist playlist, Member member){
         this.playlist = playlist;
         this.sharedMember = member;
-        this.id = new SharedPlaylistId(playlist.getId(), member.getId());
     }
 }

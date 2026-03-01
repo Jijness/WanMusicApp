@@ -28,6 +28,5 @@ public class Follower {
     public Follower(Member follower, ArtistProfile artist){
         this.follower = follower;
         this.artist = artist;
-        this.id = new FollowerId(follower.getId(), artist.getId());
     }
 }

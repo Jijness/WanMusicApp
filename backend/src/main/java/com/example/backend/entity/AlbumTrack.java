@@ -32,7 +32,6 @@ public class AlbumTrack {
     public AlbumTrack(Album album, Track track, int position){
         this.album = album;
         this.track = track;
-        this.id = new AlbumTrackId(album.getId(), track.getId());
         this.position = position;
     }
 }

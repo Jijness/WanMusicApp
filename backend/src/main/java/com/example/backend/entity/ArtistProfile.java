@@ -25,8 +25,10 @@ public class ArtistProfile {
     private String bio;
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified;
-    @Column(name = "avatar_url", length = 150, nullable = false)
-    private String avatarUrl;
+    @Column(name = "avatar_key", length = 150, nullable = false)
+    private String avatarKey;
+    @Column(name = "cover_key", length = 150, nullable = false)
+    private String coverKey;
 
     @OneToOne(
             fetch = FetchType.LAZY,

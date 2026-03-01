@@ -43,6 +43,15 @@ public class JamSession {
     )
     private List<JamParticipant> participants;
 
+
+    @OneToMany(
+            mappedBy = "jamSession",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<JamNotification> notifications;
+
     @ManyToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL

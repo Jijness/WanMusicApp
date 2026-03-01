@@ -32,6 +32,5 @@ public class UserTagPreference {
         this.member = member;
         this.tag = tag;
         this.score = score;
-        this.id = new UserTagPreferenceId(member.getId(), tag.getId());
     }
 }

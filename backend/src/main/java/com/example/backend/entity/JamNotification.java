@@ -31,19 +31,11 @@ public class JamNotification {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToOne(
+    @ManyToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            optional = false
     )
     @JoinColumn(name = "session_id")
     private JamSession jamSession;
-
-    @OneToMany(
-            mappedBy = "jamNotification",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<Member> senders;
 }

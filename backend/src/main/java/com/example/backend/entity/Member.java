@@ -18,8 +18,8 @@ import java.util.List;
 public class Member extends User{
     @Column(name = "full_name", length = 50, nullable = false)
     private String fullName;
-    @Column(name = "avatar_url", length = 150, nullable = false)
-    private String avatarUrl;
+    @Column(name = "avatar_key", length = 150, nullable = false)
+    private String avatarKey;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status;

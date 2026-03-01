@@ -43,7 +43,6 @@ public class Friendship {
     public Friendship(Member member, Member friend){
         this.member = member;
         this.friend = friend;
-        this.id = new FriendshipId(member.getId(), friend.getId());
     }
 
 }

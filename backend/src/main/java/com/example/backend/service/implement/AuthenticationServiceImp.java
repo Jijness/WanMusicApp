@@ -6,10 +6,8 @@ import com.example.backend.Enum.UserStatus;
 import com.example.backend.dto.authentication.LogInRequest;
 import com.example.backend.dto.authentication.RegisterRequest;
 import com.example.backend.dto.authentication.AuthenticationResponse;
-import com.example.backend.entity.ArtistProfile;
 import com.example.backend.entity.Member;
 import com.example.backend.entity.Token;
-import com.example.backend.entity.User;
 import com.example.backend.repository.MemberRepository;
 import com.example.backend.repository.TokenRepository;
 import com.example.backend.repository.UserRepository;
@@ -73,13 +71,17 @@ public class AuthenticationServiceImp implements AuthenticationService {
         if(userRepo.findByEmail(request.getEmail()).isPresent()){
             return new AuthenticationResponse(null, null, "Account already exists!");
         }
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setCreatedAt(LocalDateTime.now());
-        user.setRole(Role.USER);
+        Member member = new Member();
+        member.setEmail(request.getEmail());
+        member.setPassword(passwordEncoder.encode(request.getPassword()));
+        member.setCreatedAt(LocalDateTime.now());
+        member.setRole(Role.USER);
+        member.setSubscriptionType(SubscriptionType.FREE);
+        member.setFullName(request.getDisplayName());
+        member.setStatus(UserStatus.ONLINE);
+        member.setAvatarKey("avatar.png");
 
-        userRepo.save(user);
+        userRepo.save(member);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 

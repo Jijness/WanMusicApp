@@ -33,13 +33,13 @@ public class ArtistContribution {
     @JoinColumn(name = "artist_id")
     private ArtistProfile contributor;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ContributorRole role;
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+//    private ContributorRole role;
 
-    ArtistContribution(Track track, ArtistProfile contributor){
+    public ArtistContribution(Track track, ArtistProfile contributor){
         this.track = track;
         this.contributor = contributor;
-        this.id = new ArtistContributionId(track.getId(), contributor.getId());
+
     }
 }

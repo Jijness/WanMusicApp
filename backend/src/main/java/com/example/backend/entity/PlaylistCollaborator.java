@@ -37,6 +37,5 @@ public class PlaylistCollaborator {
     public PlaylistCollaborator(Playlist playlist, Member collaborator){
         this.playlist = playlist;
         this.collaborator = collaborator;
-        this.id = new PlaylistCollabId(playlist.getId(), collaborator.getId());
     }
 }
