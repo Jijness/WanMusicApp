@@ -84,4 +84,11 @@ public class TrackServiceImp implements TrackService {
 
         return "Track submitted successfully!";
     }
+
+    @Override
+    @Transactional
+    public String deleteTrack(Long trackId) {
+        trackRepo.deleteById(trackId);
+        return "Track deleted successfully!";
+    }
 }
