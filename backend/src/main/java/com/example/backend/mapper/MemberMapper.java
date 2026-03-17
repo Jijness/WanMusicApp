@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(componentModel = "spring", uses = {PlaylistMapper.class})
+@Mapper(componentModel = "spring")
 public abstract class MemberMapper {
 
     @Autowired

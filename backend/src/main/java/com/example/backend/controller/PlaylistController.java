@@ -1,11 +1,13 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.playlist.PlaylistDTO;
+import com.example.backend.dto.playlist.PlaylistPreviewDTO;
 import com.example.backend.service.PlaylistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -20,7 +22,10 @@ public class PlaylistController {
         return ResponseEntity.ok(playlistService.getPlaylistById(id));
     }
 
-    @GetMapping("/getMyPlaylists/{id}")
+    @GetMapping("/getMemberPlaylists/{id}")
+    public ResponseEntity<List<PlaylistPreviewDTO>> getMyPlaylists(@PathVariable Long id){
+        return ResponseEntity.ok(playlistService.getPlaylistsByOwnerId(id));
+    }
 
     @PostMapping("/create")
     public ResponseEntity<Long> createPlaylist(@RequestBody Map<String, String> params){

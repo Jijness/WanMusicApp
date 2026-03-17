@@ -17,12 +17,18 @@ public interface FriendshipRepository extends JpaRepository <Friendship, Friends
     )
     int countFriendByUserId(@Param("userId") Long userId);
 
+    @Query(
+            "select f from Friendship f " +
+            "where (f.friend.id = :memberId and f.member.id = :friendId) " +
+                    "or (f.friend.id = :friendId and f.member.id = :memberId)"
+    )
+    Friendship findByMemberIdAndFriendId(@Param("memberId") Long memberId, @Param("friendId") Long friendId);
+
     @Modifying
-    @Transactional
     @Query(
             "delete from Friendship f " +
             "where (f.friend.id = :memberId and f.member.id = :friendId) " +
             "   or (f.friend.id = :friendId and f.member.id = :memberId) "
     )
-    Friendship deleteByMemberIdAndFriendId(@Param("memberId") Long memberId, @Param("friendId") Long friendId);
+    void deleteByMemberIdAndFriendId(@Param("memberId") Long memberId, @Param("friendId") Long friendId);
 }

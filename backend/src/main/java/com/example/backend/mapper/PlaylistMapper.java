@@ -18,6 +18,7 @@ public abstract class PlaylistMapper {
 
     @Autowired
     private S3StorageService s3StorageService;
+
     @Autowired
     private MemberMapper memberMapper;
 
@@ -31,7 +32,7 @@ public abstract class PlaylistMapper {
 
     @Named("mapKeyToUrl")
     protected String mapKeyToUrl(String key){
-        return s3StorageService.getGetPresignedUrl(key, "thumbnail");
+        return s3StorageService.getGetPresignedUrl(key, "playlistthumbnails");
     }
 
     @Named("mapCollaboratorToUserPreviewDTO")
