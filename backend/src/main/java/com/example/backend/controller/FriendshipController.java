@@ -17,6 +17,11 @@ public class FriendshipController {
         return ResponseEntity.ok(friendshipService.addFriend(id));
     }
 
+    @PutMapping("/acceptFriend/{friendId}")
+    public ResponseEntity<String> acceptFriend(@PathVariable Long friendId){
+        return ResponseEntity.ok(friendshipService.acceptFriend(friendId));
+    }
+
     @DeleteMapping("/deleteFriend/{id}")
     public ResponseEntity<String> deleteFriend(@PathVariable Long id){
         return ResponseEntity.ok(friendshipService.deleteFriend(id));

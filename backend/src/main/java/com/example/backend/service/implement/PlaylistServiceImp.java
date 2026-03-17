@@ -49,6 +49,7 @@ public class PlaylistServiceImp implements PlaylistService {
 
         Playlist playlist = new Playlist();
         playlist.setTitle(name);
+        playlist.setThumbnailKey("default.png");
         playlist.setOwner(memberRepo.findById(currentUserId).orElseThrow(()-> new RuntimeException("Member not found!")));
 
         playlistRepo.save(playlist);
