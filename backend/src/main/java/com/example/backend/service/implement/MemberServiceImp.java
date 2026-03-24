@@ -38,6 +38,9 @@ public class MemberServiceImp implements MemberService {
         Member member = memberRepo.findById(memberId).orElseThrow(() -> new RuntimeException("Member not found!"));
 
         MemberProfileDTO memberProfileDTO = memberMapper.toProfileDTO(member);
+        Long currentUserId = authenticationService.getCurrentMemberId();
+        String status = friendshipService.getFriendshipStatus(currentUserId, memberId);
+        memberProfileDTO.setFriendStatus(status);
 
         memberProfileDTO.setFollowedArtistCount(followerService.countFollowedArtistByUserId(memberId));
         memberProfileDTO.setFriendCount(friendshipService.countFriendByUserId(memberId));
