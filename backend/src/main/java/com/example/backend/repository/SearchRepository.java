@@ -1,10 +1,13 @@
 package com.example.backend.repository;
 
+import com.example.backend.Enum.FriendStatus;
 import com.example.backend.dto.PageResponse;
 import com.example.backend.dto.SearchRequestDTO;
 import com.example.backend.dto.SearchResponseDTO;
 import com.example.backend.dto.album.AlbumPreviewDTO;
 import com.example.backend.dto.track.TrackPreviewDTO;
+import com.example.backend.dto.user.ArtistProfilePreviewDTO;
+import com.example.backend.dto.user.MemberProfilePreviewDTO;
 import com.example.backend.dto.user.UserPreviewDTO;
 import com.example.backend.entity.*;
 import com.example.backend.mapper.AlbumMapper;
@@ -42,10 +45,10 @@ public class SearchRepository {
         int pageNumber = searchRequestDTO.pageNumber();
         int offset = (pageNumber - 1) * pageSize;
 
-        List<UserPreviewDTO> artists = new ArrayList<>();
+        List<ArtistProfilePreviewDTO> artists = new ArrayList<>();
         List<TrackPreviewDTO> tracks = new ArrayList<>();
         List<AlbumPreviewDTO> albums = new ArrayList<>();
-        List<UserPreviewDTO> members = new ArrayList<>();
+        List<MemberProfilePreviewDTO> members = new ArrayList<>();
 
         SearchResponseDTO searchResponseDTO = new SearchResponseDTO();
 
@@ -105,7 +108,7 @@ public class SearchRepository {
         return searchResponseDTO;
     }
 
-    private List<UserPreviewDTO> searchArtists(String keyword, int pageSize, int offset) {
+    private List<ArtistProfilePreviewDTO> searchArtists(String keyword, int pageSize, int offset) {
         String jpql = "SELECT a, " +
                 "CASE WHEN COUNT(f.id) > 0 THEN true ELSE false END " +
                 "FROM ArtistProfile a " +
@@ -123,9 +126,8 @@ public class SearchRepository {
                 .map(result -> {
                     ArtistProfile a = (ArtistProfile) result[0];
                     boolean isFollowed = (boolean) result[1];
-                    UserPreviewDTO userPreviewDTO = artistProfileMapper.toPreviewDTO(a);
+                    ArtistProfilePreviewDTO userPreviewDTO = artistProfileMapper.toPreviewDTO(a);
                     userPreviewDTO.setFollowed(isFollowed);
-                    userPreviewDTO.setFriend(false);
                     return userPreviewDTO;
                 })
                 .collect(Collectors.toList());
@@ -185,9 +187,8 @@ public class SearchRepository {
         return query.getSingleResult();
     }
 
-    private List<UserPreviewDTO> searchMembers(String keyword, int pageSize, int offset) {
-        String jpql = "SELECT m, " +
-                "CASE WHEN COUNT(f.id) > 0 THEN true ELSE false END " +
+    private List<MemberProfilePreviewDTO> searchMembers(String keyword, int pageSize, int offset) {
+        String jpql = "SELECT m, f.status " +
                 " FROM Member m " +
                 "LEFT JOIN FETCH Friendship f ON f.friend.id = :currentUserId " +
                 "OR f.member.id = :currentUserId " +
@@ -202,11 +203,10 @@ public class SearchRepository {
         return query.getResultList().stream()
                 .map(result -> {
                     Member a = (Member) result[0];
-                    boolean isFriend = (boolean) result[1];
-                    UserPreviewDTO userPreviewDTO = memberMapper.toPreviewDTO(a);
-                    userPreviewDTO.setFollowed(false);
-                    userPreviewDTO.setFriend(isFriend);
-                    return userPreviewDTO;
+                    FriendStatus status = FriendStatus.valueOf((String) result[1]);
+                    MemberProfilePreviewDTO memberProfilePreviewDTO = memberMapper.toPreviewDTO(a);
+                    memberProfilePreviewDTO.setFriendStatus(status);
+                    return memberProfilePreviewDTO;
                 })
                 .collect(Collectors.toList());
     }
@@ -220,7 +220,7 @@ public class SearchRepository {
         return query.getSingleResult();
     }
 
-    public Page<UserPreviewDTO> searchFriends(String query, int pageNumber) {
+    public Page<MemberProfilePreviewDTO> searchFriends(String query, int pageNumber) {
         String jpql1 = "SELECT CASE WHEN fr.member.id = :currentUserId THEN fr.friend ELSE fr.member END " +
                 "FROM Friendship fr WHERE LOWER(fr.friend.fullName) " +
                 "LIKE LOWER(:query) OR LOWER(fr.member.fullName) LIKE LOWER(:query)";
@@ -231,12 +231,11 @@ public class SearchRepository {
         fetch.setFirstResult((pageNumber - 1) * 5);
         fetch.setMaxResults(5);
 
-        List<UserPreviewDTO> content = fetch.getResultList().stream()
+        List<MemberProfilePreviewDTO> content = fetch.getResultList().stream()
                 .map(member -> {
-                    UserPreviewDTO userPreviewDTO = memberMapper.toPreviewDTO(member);
-                    userPreviewDTO.setFollowed(false);
-                    userPreviewDTO.setFriend(true);
-                    return userPreviewDTO;
+                    MemberProfilePreviewDTO memberProfilePreviewDTO = memberMapper.toPreviewDTO(member);
+                    memberProfilePreviewDTO.setFriendStatus(FriendStatus.ACCEPTED);
+                    return memberProfilePreviewDTO;
                 })
                 .toList();
 

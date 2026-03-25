@@ -45,7 +45,7 @@ public class S3StorageServiceImp implements S3StorageService {
 
     @Override
     public String uploadFile(MultipartFile file, String bucketName) throws IOException {
-        String fileKey = file.getName().replace("\\s+", "_");
+        String fileKey = file.getOriginalFilename().replaceAll("\\s+", "_");
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileKey)
@@ -68,23 +68,21 @@ public class S3StorageServiceImp implements S3StorageService {
 
     @Override
     public String getGetPresignedUrl(String fileKey, String bucketName) {
-        GetObjectRequest gor = GetObjectRequest.builder()
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
-                .key(fileKey)
+                .key(fileKey.concat(".mp3"))
                 .build();
 
-        PresignedGetObjectRequest presignedRequest = s3Presigner
-                .presignGetObject(b -> b
-                        .signatureDuration(Duration.ofMinutes(10))
-                        .getObjectRequest(gor)
-                );
-
-        return presignedRequest.url().toString();
+        return s3Presigner.presignGetObject(b -> b
+                .signatureDuration(Duration.ofMinutes(10))
+                .getObjectRequest(getObjectRequest)
+                .build()
+        ).url().toString();
     }
 
     @Override
     public PresignedUploadResponseDTO getPutPresignedUrl(PresignedUploadRequestDTO request) {
-        String key = UUID.randomUUID() + "_" + request.fileName().replace("\\s+", "").trim();
+        String key = UUID.randomUUID() + "_" + request.fileName().replaceAll("\\s+", "").trim();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(request.bucketName())
@@ -92,13 +90,13 @@ public class S3StorageServiceImp implements S3StorageService {
                 .contentType(request.fileType())
                 .build();
 
-        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
-                .putObjectRequest(putObjectRequest)
-                .build();
-
-        PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
-
-        return new PresignedUploadResponseDTO(presignedRequest.url().toString(), key);
+        return new PresignedUploadResponseDTO(
+                s3Presigner.presignPutObject(b -> b
+                        .signatureDuration(Duration.ofMinutes(10))
+                        .putObjectRequest(putObjectRequest)
+                        .build()
+                ).url().toString(),
+                key
+        );
     }
 }

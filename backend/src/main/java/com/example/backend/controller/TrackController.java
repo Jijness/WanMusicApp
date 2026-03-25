@@ -21,7 +21,7 @@ public class TrackController {
 
     @GetMapping("/find")
     public ResponseEntity<String> getTrack(@RequestParam(name = "trackFile") String fileName){
-        return ResponseEntity.ok(s3StorageService.getGetPresignedUrl(fileName, "track"));
+        return ResponseEntity.ok(s3StorageService.getGetPresignedUrl(fileName, "songs"));
     }
 
     @PostMapping("/submitDraft")

@@ -25,7 +25,7 @@ public abstract class AlbumMapper {
 
     @Named("albumThumbnailKeyToUrl")
     protected String albumThumbnailKeyToUrl(String key){
-        return s3StorageService.getGetPresignedUrl(key, "thumbnail");
+        return s3StorageService.getGetPresignedUrl(key, "thumbnails");
     }
 
     @Named("albumDateToYear")
