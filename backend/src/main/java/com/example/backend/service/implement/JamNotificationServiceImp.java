@@ -2,7 +2,7 @@ package com.example.backend.service.implement;
 
 import com.example.backend.Enum.InteractionType;
 import com.example.backend.Enum.NotificationType;
-import com.example.backend.dto.CreateJamNotificationRequestDTO;
+import com.example.backend.dto.CreateJamNotificationDTO;
 import com.example.backend.dto.JamNotificationDTO;
 import com.example.backend.entity.JamNotification;
 import com.example.backend.entity.JamSession;
@@ -14,6 +14,7 @@ import com.example.backend.repository.MemberRepository;
 import com.example.backend.repository.TrackRepository;
 import com.example.backend.service.JamNotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,43 +29,47 @@ public class JamNotificationServiceImp implements JamNotificationService {
     private final TrackRepository trackRepo;
     private final JamSessionRepository jamSessionRepo;
     private final MemberRepository memberRepo;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Override
-    public JamNotificationDTO sendJamNotification(CreateJamNotificationRequestDTO request) {
-        Optional<JamSession> jamSession = jamSessionRepo.findById(request.jamId());
+    public void sendJamNotification(CreateJamNotificationDTO request) {
+        Optional<JamSession> jamSession = jamSessionRepo.findById(request.getJamJd());
         Member member = memberRepo.findById(authenticationService.getCurrentMemberId()).orElseThrow(()-> new RuntimeException("Member not found!"));
-        Track track = trackRepo.findById(request.trackId()).orElseThrow(()-> new RuntimeException("Track not found!"));
+        Track track = trackRepo.findById(request.getTrackId()).orElseThrow(()-> new RuntimeException("Track not found!"));
         JamNotification jamNotification = new JamNotification();
-
-        if(request.notificationType().equals(NotificationType.JAM_INTERACTION)){
-            if(request.interactionType().equals(InteractionType.PLAY))
-                jamNotification.setMessage(member.getFullName() + " wants to play " + track.getTitle());
-            else if(request.interactionType().equals(InteractionType.JUMP))
-                jamNotification.setMessage(member.getFullName() + " wants to jump to " + formatSecondsToMMSS(request.duration()));
-            else if(request.interactionType().equals(InteractionType.SKIP))
-                jamNotification.setMessage(member.getFullName() + " wants to skip this song");
-            else if(request.interactionType().equals(InteractionType.PAUSE))
-                jamNotification.setMessage(member.getFullName() + " wants to pause the song");
-            else if(request.interactionType().equals(InteractionType.PREVIOUS))
-                jamNotification.setMessage(member.getFullName() + " wants to go back to the previous song");
-        }else if(request.notificationType().equals(NotificationType.JAM_JOIN))
-            jamNotification.setMessage(member.getFullName() + " joined the jam");
 
         if(jamSession.isEmpty())
             throw new RuntimeException("Jam session not found!");
 
+        if(request.getNotificationType().equals(NotificationType.JAM_INTERACTION)){
+            if(request.getInteractionType().equals(InteractionType.PLAY))
+                jamNotification.setMessage(member.getFullName() + " wants to play " + track.getTitle());
+            else if(request.getInteractionType().equals(InteractionType.JUMP))
+                jamNotification.setMessage(member.getFullName() + " wants to jump to " + formatSecondsToMMSS(request.getDuration()));
+            else if(request.getInteractionType().equals(InteractionType.SKIP))
+                jamNotification.setMessage(member.getFullName() + " wants to skip this song");
+            else if(request.getInteractionType().equals(InteractionType.PAUSE))
+                jamNotification.setMessage(member.getFullName() + " wants to pause the song");
+            else if(request.getInteractionType().equals(InteractionType.PREVIOUS))
+                jamNotification.setMessage(member.getFullName() + " wants to go back to the previous song");
+        }else if(request.getNotificationType().equals(NotificationType.JAM_JOIN))
+            jamNotification.setMessage(member.getFullName() + " joined the jam");
+
+
         jamNotification.setJamSession(jamSession.get());
-        jamNotification.setType(request.notificationType());
+        jamNotification.setType(request.getNotificationType());
         jamNotification.setCreatedAt(LocalDateTime.now());
 
         jamNotification = jamNotificationRepo.save(jamNotification);
 
-        return new JamNotificationDTO(
+        JamNotificationDTO jamNotificationDTO = new JamNotificationDTO(
                 jamNotification.getId(),
                 jamNotification.getMessage(),
                 jamNotification.getType(),
                 jamNotification.getCreatedAt()
         );
+
+        simpMessagingTemplate.convertAndSend("/jam/notification" + jamSession.get().getId(), jamNotificationDTO);
     }
 
     private String formatSecondsToMMSS(int totalSeconds) {

@@ -50,22 +50,6 @@ public class ArtistProfileServiceImp implements ArtistProfileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String approveArtistProfileRequest(Long artistProfileId) {
-        ArtistProfile profile = artistProfileRepo.findById(artistProfileId).orElseThrow(()-> new RuntimeException("Artist profile not found!"));
-        profile.setStatus(ArtistProfileStatus.VERIFIED);
-        return "Approved artist profile request successfully!";
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public String rejectArtistProfileRequest(Long artistProfileId) {
-        ArtistProfile profile = artistProfileRepo.findById(artistProfileId).orElseThrow(()-> new RuntimeException("Artist profile not found!"));
-        profile.setStatus(ArtistProfileStatus.REJECTED);
-        return "Rejected artist profile request successfully!";
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
     public String updateProfile(MemberUpdateProfileDTO dto) {
         Long currentUserId = authenticationService.getCurrentMemberId();
 

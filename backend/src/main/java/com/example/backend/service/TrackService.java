@@ -14,8 +14,6 @@ public interface TrackService {
 
     PageResponse<TrackAdminReviewDTO> getTracksByStatus(TrackStatus status, int index, int size);
     TrackDraftResponseDTO createDraft(TrackCreateDraftDTO dto);
-    String approveTrack(Long trackId);
-    String rejectTrack(Long trackId);
     String updateTrackStatus(UpdateTrackStatusDTO dto);
     String submitTrack(TrackSubmitDTO dto);
     String deleteTrack(Long trackId);

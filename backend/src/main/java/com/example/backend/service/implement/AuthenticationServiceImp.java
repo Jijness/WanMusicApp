@@ -124,6 +124,14 @@ public class AuthenticationServiceImp implements AuthenticationService {
         return userPrinciple.getId();
     }
 
+    @Override
+    public String getCurrentMemberName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+        return userPrinciple.getUsername();
+    }
+
+
     private void saveToken(String email, String accessToken, String refreshToken){
         tokenRepo.logoutAllTokensByEmail(email);
 
