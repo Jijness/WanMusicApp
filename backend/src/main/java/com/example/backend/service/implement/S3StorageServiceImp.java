@@ -55,7 +55,7 @@ public class S3StorageServiceImp implements S3StorageService {
     public String getGetPresignedUrl(String fileKey, String bucketName) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
-                .key(fileKey.concat(".mp3"))
+                .key(fileKey)
                 .build();
 
         return s3Presigner.presignGetObject(b -> b
@@ -74,6 +74,8 @@ public class S3StorageServiceImp implements S3StorageService {
                 .key(key)
                 .contentType(request.fileType())
                 .build();
+
+        System.out.println(request.fileType());
 
         return new PresignedUploadResponseDTO(
                 s3Presigner.presignPutObject(b -> b
