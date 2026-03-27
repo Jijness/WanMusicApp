@@ -148,6 +148,6 @@ public class AuthenticationServiceImp implements AuthenticationService {
         token.setLoggedOut(false);
         token.setUser(userRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User not found!")));
 
-        tokenRepo.save(token);
+        tokenRepo.saveAndFlush(token);
     }
 }
