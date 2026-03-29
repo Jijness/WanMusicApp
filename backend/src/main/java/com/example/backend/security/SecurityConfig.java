@@ -57,7 +57,6 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/v1/auth/refresh",
                                 "/api/v1/auth/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
@@ -81,7 +80,7 @@ public class SecurityConfig {
                         })
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(customizer -> customizer.logoutUrl("/api/auth/logout")
+                .logout(customizer -> customizer.logoutUrl("api/v1/auth/logout")
                         .addLogoutHandler(customLoggoutHandler)
                         .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()))
                 .build();

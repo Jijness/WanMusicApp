@@ -59,6 +59,9 @@ public class ArtistProfileServiceImp implements ArtistProfileService {
             profile.setMember(member);
         }
 
+        Member member = memberRepo.findById(authenticationService.getCurrentMemberId()).orElseThrow(()-> new RuntimeException("Member not found!"));
+
+        profile.setMember(member);
         profile.setStageName(dto.stageName());
         profile.setBio(dto.bio());
         if (existing.isPresent()) {
@@ -70,7 +73,7 @@ public class ArtistProfileServiceImp implements ArtistProfileService {
         profile.setStatus(ArtistProfileStatus.PENDING);
         profile.setCreatedAt(LocalDateTime.now());
 
-        artistProfileRepo.saveAndFlush(profile);
+        artistProfileRepo.save(profile);
 
         return "Send request successfully!";
     }
