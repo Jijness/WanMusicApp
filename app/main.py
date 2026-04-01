@@ -1,5 +1,6 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
@@ -13,6 +14,7 @@ from app.service import MusicTaggerService
 app = FastAPI(title=settings.app_name, version=settings.app_version)
 static_dir = Path(__file__).resolve().parent / 'static'
 app.mount('/static', StaticFiles(directory=static_dir), name='static')
+logger = logging.getLogger(__name__)
 
 service: MusicTaggerService | None = None
 startup_error: str | None = None
@@ -79,4 +81,6 @@ async def predict(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f'Inference error: {exc}') from exc
+        logger.exception('Unhandled inference error')
+        raise HTTPException(status_code=500, detail='Internal inference error.') from exc
+
