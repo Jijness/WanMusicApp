@@ -41,9 +41,7 @@ class MusicTaggerService:
         x = torch.from_numpy(log_mel).unsqueeze(0).unsqueeze(0).to(self.device)
 
         logits_list = [loaded.model(x) for loaded in self.models]
-        logits = self._merge_logits(logits_list)
-
-        probs = F.softmax(logits, dim=-1)[0].detach().cpu().numpy()
+        probs = self._merge_probabilities(logits_list)[0].detach().cpu().numpy()
         k = min(top_k or settings.top_k, len(self.labels))
         idx = np.argsort(probs)[::-1][:k]
 
@@ -54,17 +52,29 @@ class MusicTaggerService:
             'top_k': top_items,
         }
 
-    def _merge_logits(self, logits_list: List[torch.Tensor]) -> torch.Tensor:
+    def _merge_probabilities(self, logits_list: List[torch.Tensor]) -> torch.Tensor:
         if len(logits_list) == 1:
-            return logits_list[0]
+            return F.softmax(logits_list[0], dim=-1)
 
-        weighted = []
-        for i, loaded in enumerate(self.models):
+        weights = []
+        for loaded in self.models:
             w = self.ensemble_weights.get(loaded.name)
             if w is None:
-                w = 1.0 / len(self.models)
-            weighted.append(logits_list[i] * w)
-        return sum(weighted)
+                w = 1.0
+            weights.append(float(w))
+
+        total_weight = sum(weights)
+        if total_weight <= 0:
+            weights = [1.0] * len(self.models)
+            total_weight = float(len(self.models))
+
+        merged = None
+        for logits, weight in zip(logits_list, weights):
+            probs = F.softmax(logits, dim=-1)
+            weighted_probs = probs * (weight / total_weight)
+            merged = weighted_probs if merged is None else merged + weighted_probs
+        assert merged is not None
+        return merged
 
     def _load_models(self) -> List[LoadedModel]:
         if settings.enable_ensemble:
