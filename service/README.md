@@ -6,9 +6,8 @@ Service FastAPI chay an de frontend gui file nhac va nhan ket qua gan nhan (labe
 
 - Frontend upload 1 file am thanh len service.
 - Service tra ve:
-  - `predicted_label`: nhan chinh de hien thi/su dung trong app.
-  - `top_labels`: danh sach top-k nhan + score.
-  - `n_segments`, `elapsed_ms`, `model_version`.
+  - `POST /predict`: list string labels theo thu tu top-k (vd: `["acoustic","indie","lofi"]`).
+  - `POST /predict/batch`: JSON ket qua tung file (chi tiet score, metadata).
 
 ## 2. Chay service local
 
@@ -75,19 +74,10 @@ Tra metrics runtime (`predict_requests`, `predict_errors`, `avg_latency_ms`, ...
   - `top_k` (1..`MAX_TOP_K`)
   - `min_confidence` (0..1)
 
-Response mau:
+Response mau (JSON list string):
 
 ```json
-{
-  "predicted_label": "acoustic",
-  "top_labels": [
-    { "label": "acoustic", "score": 0.625 },
-    { "label": "indie", "score": 0.1512 }
-  ],
-  "n_segments": 5,
-  "elapsed_ms": 10049.6,
-  "model_version": "training_results.json"
-}
+["acoustic", "indie", "lofi", "vpop", "trap"]
 ```
 
 ### `POST /predict/batch`
@@ -141,4 +131,4 @@ Neu `REQUIRE_API_KEY=false` thi bo header `x-api-key`.
 - Nen bind `127.0.0.1` hoac private network, khong expose public truc tiep.
 - Neu frontend goi truc tiep thi bat API key va gioi han origin.
 - Theo doi `/metrics` de tinh chinh throughput.
-- Neu `predicted_label="unknown"`, frontend nen cho phep user/chuyen vien chon nhan lai.
+- Neu response la `unknown`, frontend nen cho phep user/chuyen vien chon nhan lai.

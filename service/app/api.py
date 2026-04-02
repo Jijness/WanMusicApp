@@ -269,7 +269,7 @@ def get_metrics() -> dict[str, float | int]:
         }
 
 
-@router.post("/predict", response_model=PredictResponse, tags=["inference"])
+@router.post("/predict", response_model=list[str], tags=["inference"])
 async def predict(
     request: Request,
     file: UploadFile = File(..., description="Audio file"),
@@ -283,7 +283,9 @@ async def predict(
 
     async with predict_semaphore:
         try:
-            return await _predict_from_file(file, top_k=top_k, min_confidence=min_confidence)
+            result = await _predict_from_file(file, top_k=top_k, min_confidence=min_confidence)
+            ordered_labels = [item.label for item in result.top_labels]
+            return ordered_labels if ordered_labels else [settings.unknown_label]
         except HTTPException:
             with metrics_lock:
                 metrics.predict_errors += 1
