@@ -7,6 +7,7 @@ import com.example.backend.entity.Member;
 import com.example.backend.mapper.MemberMapper;
 import com.example.backend.repository.MemberRepository;
 import com.example.backend.service.*;
+import com.example.backend.util.FriendUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ public class MemberServiceImp implements MemberService {
     private final FollowerService followerService;
     private final PlaylistService playlistService;
     private final FriendshipService friendshipService;
+    private final FriendUtil friendUtil;
     private final S3StorageService s3StorageService;
 
     @Override
@@ -43,7 +45,7 @@ public class MemberServiceImp implements MemberService {
 
         MemberProfileDTO memberProfileDTO = memberMapper.toProfileDTO(member);
         Long currentUserId = authenticationService.getCurrentMemberId();
-        String status = friendshipService.getFriendshipStatus(currentUserId, memberId);
+        String status = friendUtil.getFriendshipStatus(currentUserId, memberId);
         memberProfileDTO.setFriendStatus(status);
 
         memberProfileDTO.setFollowedArtistCount(followerService.countFollowedArtistByUserId(memberId));

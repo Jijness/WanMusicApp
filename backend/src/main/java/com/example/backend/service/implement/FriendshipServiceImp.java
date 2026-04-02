@@ -33,6 +33,7 @@ public class FriendshipServiceImp implements FriendshipService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String sendFriendRequest(Long friendId) {
         Friendship friendship = new Friendship();
 
@@ -62,20 +63,38 @@ public class FriendshipServiceImp implements FriendshipService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String acceptFriendRequest(Long friendId) {
+    public String rejectFriendRequest(Long friendId) {
         Member currentMember = memberRepo.findById(authenticationService.getCurrentMemberId()).orElseThrow(()-> new RuntimeException("Member not found!"));
 
         Friendship friendship = friendshipRepo.findByMemberIdAndFriendId(currentMember.getId(), friendId);
 
         friendship.setStatus(FriendStatus.ACCEPTED);
 
-        return "Accepted friend request successfully!";
+        return "Rejected friend request successfully!";
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String acceptFriendRequest(FriendshipId friendshipId) {
-        Friendship friendship = friendshipRepo.findById(friendshipId).orElseThrow(()-> new RuntimeException("Friendship not found!"));
+    public String deleteFriendRequest(Long friendId) {
+        Member currentMember = memberRepo.findById(authenticationService.getCurrentMemberId()).orElseThrow(()-> new RuntimeException("Member not found!"));
+
+        Friendship friendship = friendshipRepo.findByMemberIdAndFriendId(currentMember.getId(), friendId);
+
+        if(friendship.getStatus() != FriendStatus.PENDING)
+            throw new RuntimeException("Cannot delete friend request which is not pending!");
+
+        friendshipRepo.delete(friendship);
+
+        return "Deleted  friend request successfully!";
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String acceptFriendRequest(Long friendId) {
+        Member currentMember = memberRepo.findById(authenticationService.getCurrentMemberId()).orElseThrow(()-> new RuntimeException("Member not found!"));
+
+        Friendship friendship = friendshipRepo.findByMemberIdAndFriendId(currentMember.getId(), friendId);
+
         friendship.setStatus(FriendStatus.ACCEPTED);
 
         return "Accepted friend request successfully!";
@@ -91,25 +110,4 @@ public class FriendshipServiceImp implements FriendshipService {
         return "Deleted friend successfully!";
     }
 
-    @Override
-    public String getFriendshipStatus(Long currentUserId, Long targetUserId) {
-        if (currentUserId.equals(targetUserId)) {
-            return "SELF";
-        }
-        Friendship friendship = friendshipRepo.findByMemberIdAndFriendId(currentUserId, targetUserId);
-        if (friendship == null) {
-            return "NONE";
-        }
-        if (friendship.getStatus() == FriendStatus.ACCEPTED) {
-            return "ACCEPTED";
-        }
-        if (friendship.getStatus() == FriendStatus.PENDING) {
-            if(friendship.getMember().getId().equals(currentUserId)) {
-                return "PENDING_SENT";
-            }else{
-                return "PENDING_RECEIVED";
-            }
-        }
-        return "NONE";
-    }
 }

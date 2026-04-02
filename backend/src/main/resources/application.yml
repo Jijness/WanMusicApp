@@ -8,6 +8,7 @@ spring:
     password: Mobile123@
 
   jpa:
+
     hibernate:
       ddl-auto: update
 
