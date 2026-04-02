@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -108,6 +109,18 @@ public class FriendshipServiceImp implements FriendshipService {
         friendshipRepo.deleteByMemberIdAndFriendId(currentUserId, friendId);
 
         return "Deleted friend successfully!";
+    }
+
+    public String getFriendshipStatus(Long currentUserId, Long friendId) {
+        Friendship friendship = friendshipRepo.findByMemberIdAndFriendId(currentUserId, friendId);
+
+        if(Objects.equals(friendship.getMember().getId(), currentUserId) && friendship.getStatus().equals(FriendStatus.PENDING))
+            return "PENDING_SENT";
+        if(Objects.equals(friendship.getFriend().getId(), currentUserId) && friendship.getStatus().equals(FriendStatus.PENDING))
+            return "PENDING_RECEIVED";
+        if(friendship.getStatus().equals(FriendStatus.ACCEPTED))
+            return "FRIEND";
+        return "NONE";
     }
 
 }

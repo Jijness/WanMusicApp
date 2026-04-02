@@ -7,4 +7,5 @@ public interface FriendshipService {
     String rejectFriendRequest(Long friendId);
     String deleteFriendRequest(Long friendId);
     String deleteFriend(Long friendId);
+    String getFriendshipStatus(Long currentUserId, Long friendId);
 }
