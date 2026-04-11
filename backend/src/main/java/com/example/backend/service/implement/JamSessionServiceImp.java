@@ -1,26 +1,25 @@
 package com.example.backend.service.implement;
 
 import com.example.backend.dto.jam.CreateJamSessionRequestDTO;
-import com.example.backend.dto.jam.JamDTO;
+import com.example.backend.dto.jam.JamPreviewDTO;
 import com.example.backend.dto.jam.UpdateJamSessionRequestDTO;
+import com.example.backend.entity.JamPlayerState;
 import com.example.backend.entity.JamSession;
-import com.example.backend.repository.JamNotificationRepository;
-import com.example.backend.repository.JamParticipantRepository;
-import com.example.backend.repository.JamSessionRepository;
-import com.example.backend.repository.MemberRepository;
+import com.example.backend.repository.*;
 import com.example.backend.service.AuthenticationService;
 import com.example.backend.service.JamSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class JamSessionServiceImp implements JamSessionService {
 
+    private final JamPlayerStateRepository jamPlayerStateRepo;
     private final JamSessionRepository jamSessionRepo;
     private final JamNotificationRepository jamNotificationRepo;
     private final JamParticipantRepository jamParticipantRepo;
@@ -29,7 +28,7 @@ public class JamSessionServiceImp implements JamSessionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public JamDTO createJamSession(CreateJamSessionRequestDTO dto) {
+    public JamPreviewDTO createJamSession(CreateJamSessionRequestDTO dto) {
         JamSession jamSession = new JamSession();
         jamSession.setSessionCode(UUID.randomUUID().toString());
         jamSession.setOwner(memberRepo.findById(authenticationService.getCurrentMemberId()).get());
@@ -38,17 +37,27 @@ public class JamSessionServiceImp implements JamSessionService {
 
         try{
             jamSession = jamSessionRepo.save(jamSession);
+
+            JamPlayerState jamPlayerState = new JamPlayerState();
+            jamPlayerState.setJamSession(jamSession);
+            jamPlayerState.setPlaying(false);
+            jamPlayerState.setCurrentSeekPosition(0);
+            jamPlayerState.setLastUpdated(LocalDateTime.now());
+
+            jamSession.setPlayerState(jamPlayerState);
+
+            jamPlayerStateRepo.save(jamPlayerState);
         } catch (Exception e){
             if(e.getMessage().contains("Duplicate entry")){
                 throw new RuntimeException("You've already created a jam session!");
             }
         }
 
-        JamDTO jamDTO = new JamDTO();
-        jamDTO.setId(jamSession.getId());
-        jamDTO.setCode(jamSession.getSessionCode());
+        JamPreviewDTO jamPreviewDTO = new JamPreviewDTO();
+        jamPreviewDTO.setId(jamSession.getId());
+        jamPreviewDTO.setCode(jamSession.getSessionCode());
 
-        return jamDTO;
+        return jamPreviewDTO;
     }
 
     @Override

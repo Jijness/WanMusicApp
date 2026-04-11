@@ -34,11 +34,13 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-                if(StompCommand.CONNECT.equals(accessor.getCommand())){
+                StompHeaderAccessor accessor =
+                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
+                if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
                     handleConnect(accessor);
                 }
-                return ChannelInterceptor.super.preSend(message, channel);
+                return message;
             }
         });
     }
@@ -46,24 +48,27 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
     private void handleConnect(StompHeaderAccessor accessor){
         try{
             String authToken = accessor.getFirstNativeHeader("Authorization");
-            if(authToken != null && authToken.startsWith("Bearer")){
-                String accessToken = authToken.substring(7);
-                String email = jwtTokenProvider.extractSubject(accessToken);
 
-                if(email != null && SecurityContextHolder.getContext().getAuthentication() == null){
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-                    if(jwtTokenProvider.validateAccessToken(accessToken, userDetails)){
-                        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(token);
-                        accessor.setUser(token);
-                    }
-                }
-
-                log.info("Connected to websocket!: " + email);
-            }else{
-                log.error("Invalid token!");
+            if (authToken == null || !authToken.startsWith("Bearer ")) {
+                throw new IllegalArgumentException("Missing or invalid Authorization header");
             }
+
+            String accessToken = authToken.substring(7);
+            String email = jwtTokenProvider.extractSubject(accessToken);
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+            if (!jwtTokenProvider.validateAccessToken(accessToken, userDetails)) {
+                throw new IllegalArgumentException("Invalid access token");
+            }
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+
+            accessor.setUser(authentication);
+            log.info("Connected to websocket: {}", email);
         }catch (Exception e){
             log.error("Error while connecting to websocket: " + e.getMessage());
         }

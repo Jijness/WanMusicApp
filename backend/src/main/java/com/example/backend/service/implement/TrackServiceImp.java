@@ -33,6 +33,7 @@ import java.net.http.HttpClient;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,6 +48,14 @@ public class TrackServiceImp implements TrackService {
     private final S3StorageService s3StorageService;
 
     @Override
+    @Transactional(readOnly = true)
+    public TrackPreviewDTO getTrack(Long trackId) {
+        Track track = trackRepo.findById(trackId).orElseThrow(()-> new RuntimeException("Track not found!"));
+        return trackMapper.toTrackPreviewDTO(track);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public PageResponse<TrackAdminReviewDTO> getTracksByStatus(TrackStatus status, int index, int size) {
         return pageMapper.toPageResponse(trackRepo.findAllByStatusAndNotInAlbum(status, PageRequest.of(index, size)), trackMapper::toTrackAdminReviewDTO);
     }

@@ -3,7 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dto.CreateJamInvitationRequestDTO;
 import com.example.backend.dto.jam.JamParticipantRequestDTO;
 import com.example.backend.dto.jam.CreateJamSessionRequestDTO;
-import com.example.backend.dto.jam.JamDTO;
+import com.example.backend.dto.jam.JamPreviewDTO;
 import com.example.backend.dto.jam.UpdateJamSessionRequestDTO;
 import com.example.backend.service.JamParticipantService;
 import com.example.backend.service.JamSessionService;
@@ -19,8 +19,11 @@ public class JamController {
     private final JamSessionService jamSessionService;
     private final JamParticipantService jamParticipantService;
 
+//    @GetMapping("/{id}")
+//    public ResponseEntity<JamPreviewDTO> getJamSessionById(@PathVariable Long id){}
+
     @PostMapping
-    public ResponseEntity<JamDTO> createJamSession(@RequestBody CreateJamSessionRequestDTO dto){
+    public ResponseEntity<JamPreviewDTO> createJamSession(@RequestBody CreateJamSessionRequestDTO dto){
         return ResponseEntity.ok(jamSessionService.createJamSession(dto));
     }
 

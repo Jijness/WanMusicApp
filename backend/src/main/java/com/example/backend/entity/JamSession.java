@@ -43,14 +43,6 @@ public class JamSession {
 
     @OneToMany(
             mappedBy = "jamSession",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<PlayerState> playerStates;
-
-    @OneToMany(
-            mappedBy = "jamSession",
             fetch = FetchType.LAZY
     )
     private List<JamNotification> jamNotifications;
@@ -78,4 +70,12 @@ public class JamSession {
     )
     @JoinColumn(name = "context_album_id")
     private Album contextAlbum;
+
+    @OneToOne(
+            mappedBy = "jamSession",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private JamPlayerState playerState;
 }

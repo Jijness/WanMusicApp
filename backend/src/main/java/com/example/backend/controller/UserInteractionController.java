@@ -24,15 +24,15 @@ public class UserInteractionController {
     private final UserInteractionService userInteractionService;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    @MessageMapping("/jam")
+    @MessageMapping("/jam/notification")
     public void handleJamNotification(CreateJamNotificationDTO request, Principal principal){
 
         if(principal == null)
             throw new IllegalStateException("Unauthenticated websocket user");
 
         JamNotificationDTO jamNotificationDTO = jamNotificationService.sendJamNotification(request, principal.getName());
-        System.out.println(jamNotificationDTO.interactionType());
-        simpMessagingTemplate.convertAndSend("/jam/notification/" + jamNotificationDTO.jamSessionId(), jamNotificationDTO);
+        System.out.println(jamNotificationDTO.getInteractionType());
+        simpMessagingTemplate.convertAndSend("/jam/notification/" + jamNotificationDTO.getJamSessionId(), jamNotificationDTO);
     }
 
     @PostMapping
