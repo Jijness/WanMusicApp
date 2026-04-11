@@ -4,15 +4,12 @@ import com.example.backend.dto.PageResponse;
 import com.example.backend.dto.SearchRequestDTO;
 import com.example.backend.dto.SearchResponseDTO;
 import com.example.backend.dto.user.MemberProfilePreviewDTO;
-import com.example.backend.dto.user.UserPreviewDTO;
 import com.example.backend.mapper.PageMapper;
 import com.example.backend.repository.SearchRepository;
 import com.example.backend.service.RedisService;
-import com.example.backend.service.SearchCacheVersionService;
+import com.example.backend.service.CacheVersionService;
 import com.example.backend.service.SearchService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,13 +19,13 @@ public class SearchServiceImp implements SearchService {
     private final SearchRepository searchRepo;
     private final PageMapper pageMapper;
     private final RedisService redisService;
-    private final SearchCacheVersionService searchCacheVersionService;
+    private final CacheVersionService cacheVersionService;
 
     @Override
     public SearchResponseDTO search(SearchRequestDTO searchRequestDTO) {
-        long trackVersion = searchCacheVersionService.getTrackVersion();
-        long albumVersion = searchCacheVersionService.getAlbumVersion();
-        long artistVersion = searchCacheVersionService.getArtistVersion();
+        long trackVersion = cacheVersionService.getTrackVersion();
+        long albumVersion = cacheVersionService.getAlbumVersion();
+        long artistVersion = cacheVersionService.getArtistVersion();
 
         String key = "/search/vTrack" + trackVersion + "/vAlbum" + albumVersion + "/vArtist" + artistVersion +
                 "/" + searchRequestDTO.keyword() +

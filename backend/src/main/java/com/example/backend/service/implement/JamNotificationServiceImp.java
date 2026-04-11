@@ -17,18 +17,15 @@ import com.example.backend.repository.JamNotificationRepository;
 import com.example.backend.repository.JamSessionRepository;
 import com.example.backend.repository.MemberRepository;
 import com.example.backend.repository.TrackRepository;
+import com.example.backend.service.CacheVersionService;
 import com.example.backend.service.JamNotificationService;
-import com.example.backend.service.S3StorageService;
+import com.example.backend.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,6 +38,8 @@ public class JamNotificationServiceImp implements JamNotificationService {
     private final MemberRepository memberRepo;
     private final PageMapper pageMapper;
     private final JamNotificationMapper jamNotificationMapper;
+    private final RedisService redisService;
+    private final CacheVersionService cacheVersionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -86,14 +85,22 @@ public class JamNotificationServiceImp implements JamNotificationService {
         }else if(request.getNotificationType().equals(NotificationType.JAM_JOIN))
             message = member.getFullName() + " joined the jam";
 
-        if(isOwner) jamNotification.setStatus(null);
-        else jamNotification.setStatus(JamInteractionStatus.PENDING);
+        JamInteractionStatus status = null;
+
+        if(isOwner){
+            jamNotification.setStatus(null);
+        } else {
+            jamNotification.setStatus(JamInteractionStatus.PENDING);
+            status = JamInteractionStatus.PENDING;
+        }
         jamNotification.setMessage(message);
         jamNotification.setJamSession(jamSession.get());
         jamNotification.setType(request.getNotificationType());
         jamNotification.setCreatedAt(LocalDateTime.now());
 
         jamNotification = jamNotificationRepo.save(jamNotification);
+
+        cacheVersionService.bumpJamNotificationVersion(jamSession.get().getId());
 
         JamNotificationDTO jamNotificationDTO = new JamNotificationDTO(
                 jamSession.get().getId(),
@@ -103,7 +110,7 @@ public class JamNotificationServiceImp implements JamNotificationService {
                 jamNotification.getMessage(),
                 jamNotification.getType(),
                 request.getInteractionType(),
-                JamInteractionStatus.PENDING,
+                status,
                 request.getDuration(),
                 jamNotification.getCreatedAt()
         );
@@ -113,9 +120,21 @@ public class JamNotificationServiceImp implements JamNotificationService {
 
     @Override
     public PageResponse<JamNotificationDTO> getJamNotifications(GetJamNotificationRequestDTO dto) {
-        return pageMapper.toPageResponse(jamNotificationRepo.findByJamSessionId(
-                dto.jamId(),
-                PageRequest.of(dto.index() - 1, dto.size())
-        ), jamNotificationMapper::toDTO);
+        String key = "/jam/notification/" + "/" + dto.jamId() + cacheVersionService.getJamNotificationVersion(dto.jamId());
+
+        PageResponse<JamNotificationDTO> response = null;
+
+        if(redisService.hasKey(key)) response = (PageResponse<JamNotificationDTO>) redisService.get(key);
+        else {
+
+            response = pageMapper.toPageResponse(jamNotificationRepo.findByJamSessionId(
+                    dto.jamId(),
+                    PageRequest.of(dto.index() - 1, dto.size())
+            ), jamNotificationMapper::toDTO);
+
+            redisService.save(key, response, 60);
+        }
+
+        return response;
     }
 }

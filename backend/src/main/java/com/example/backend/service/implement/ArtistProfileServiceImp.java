@@ -34,12 +34,12 @@ public class ArtistProfileServiceImp implements ArtistProfileService {
     @Override
     public ArtistProfileDTO getProfile(Long artistId) {
         String key = "/artist/profile/" + artistId;
-        ArtistProfileDTO dto = null;
+
         if (redisService.hasKey(key))
             return (ArtistProfileDTO) redisService.get(key);
 
         ArtistProfile profile = artistProfileRepo.findById(artistId).orElseThrow(()-> new RuntimeException("Artist profile not found!"));
-        dto = artistProfileMapper.toArtistProfileDTO(profile);
+        ArtistProfileDTO dto = artistProfileMapper.toArtistProfileDTO(profile);
         dto.setAlbums(albumService.getAlbumsByArtistId(new GetAlbumsPaginationRequest(artistId, 1, 4)));
 
         redisService.save(key, dto, 60);

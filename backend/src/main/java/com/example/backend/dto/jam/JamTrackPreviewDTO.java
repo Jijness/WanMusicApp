@@ -19,5 +19,7 @@ public class JamTrackPreviewDTO extends TrackPreviewDTO {
         this.setThumbnailUrl(trackPreviewDTO.getThumbnailUrl());
         this.setTitle(trackPreviewDTO.getTitle());
         this.setContributors(trackPreviewDTO.getContributors());
+        this.currentSeekPosition = 0;
+        this.isPlaying = true;
     }
 }

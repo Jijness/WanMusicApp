@@ -11,7 +11,7 @@ import com.example.backend.repository.ArtistProfileRepository;
 import com.example.backend.repository.TrackRepository;
 import com.example.backend.service.AdminService;
 import com.example.backend.service.NotificationService;
-import com.example.backend.service.SearchCacheVersionService;
+import com.example.backend.service.CacheVersionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +29,7 @@ public class AdminServiceImp implements AdminService {
     private final TrackRepository trackRepo;
     private final NotificationService notificationService;
     private final ArtistProfileMapper artistProfileMapper;
-    private final SearchCacheVersionService searchCacheVersionService;
+    private final CacheVersionService cacheVersionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -37,7 +37,7 @@ public class AdminServiceImp implements AdminService {
         ArtistProfile profile = artistProfileRepo.findById(artistProfileId).orElseThrow(()-> new RuntimeException("Artist profile not found!"));
         profile.setStatus(ArtistProfileStatus.VERIFIED);
 
-        searchCacheVersionService.bumpArtistVersion();
+        cacheVersionService.bumpArtistVersion();
 
         return "Approved artist profile request successfully!";
     }
@@ -80,7 +80,7 @@ public class AdminServiceImp implements AdminService {
             notificationService.sendNotification(notificationDTO);
         }
 
-        searchCacheVersionService.bumpTrackVersion();
+        cacheVersionService.bumpTrackVersion();
 
         return "Track approved successfully!";
     }
@@ -109,7 +109,7 @@ public class AdminServiceImp implements AdminService {
         }
         trackRepo.saveAll(tracks);
 
-        searchCacheVersionService.bumpAlbumVersion();
+        cacheVersionService.bumpAlbumVersion();
 
         return "Approved album request successfully!";
     }

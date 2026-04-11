@@ -74,7 +74,7 @@ public class JamPlayerStateServiceImp implements JamPlayerStateService {
         }else if(dto.interactionType().equals(InteractionType.PLAY)){
             jamTrack.setId(dto.trackId());
             jamTrack.setPlaying(true);
-            jamTrack.setCurrentSeekPosition(0);
+            jamTrack.setCurrentSeekPosition(dto.seekPosition());
         }else if(dto.interactionType().equals(InteractionType.PAUSE)){
             jamTrack.setId(dto.trackId());
             jamTrack.setPlaying(false);

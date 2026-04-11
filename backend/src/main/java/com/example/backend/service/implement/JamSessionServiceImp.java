@@ -1,10 +1,11 @@
 package com.example.backend.service.implement;
 
-import com.example.backend.dto.jam.CreateJamSessionRequestDTO;
-import com.example.backend.dto.jam.JamPreviewDTO;
-import com.example.backend.dto.jam.UpdateJamSessionRequestDTO;
+import com.example.backend.dto.jam.*;
+import com.example.backend.dto.track.TrackPreviewDTO;
 import com.example.backend.entity.JamPlayerState;
 import com.example.backend.entity.JamSession;
+import com.example.backend.mapper.JamMapper;
+import com.example.backend.mapper.TrackMapper;
 import com.example.backend.repository.*;
 import com.example.backend.service.AuthenticationService;
 import com.example.backend.service.JamSessionService;
@@ -25,6 +26,29 @@ public class JamSessionServiceImp implements JamSessionService {
     private final JamParticipantRepository jamParticipantRepo;
     private final AuthenticationService authenticationService;
     private final MemberRepository memberRepo;
+    private final JamMapper jamMapper;
+    private final TrackMapper trackMapper;
+
+    @Override
+    @Transactional(readOnly = true)
+    public JamDTO getJamSessionById(Long jamSessionId) {
+
+        JamSession jamSession = jamSessionRepo.findById(jamSessionId).orElseThrow(()-> new RuntimeException("Jam session not found!"));
+        JamDTO jamDTO = jamMapper.toJamDTO(jamSession);
+        TrackPreviewDTO trackPreviewDTO = trackMapper.toTrackPreviewDTO(jamSession.getCurrentTrack());
+        JamTrackPreviewDTO jamTrackPreviewDTO = new JamTrackPreviewDTO(trackPreviewDTO);
+
+        jamPlayerStateRepo.findByJamSessionId(jamSessionId).ifPresent(
+                jamPlayerState -> {
+                    jamTrackPreviewDTO.setCurrentSeekPosition(jamPlayerState.getCurrentSeekPosition());
+                    jamTrackPreviewDTO.setPlaying(jamPlayerState.isPlaying());
+                }
+        );
+
+        jamDTO.setJamTrack(jamTrackPreviewDTO);
+
+        return jamDTO;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

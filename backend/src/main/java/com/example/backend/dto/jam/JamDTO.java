@@ -1,6 +1,8 @@
 package com.example.backend.dto.jam;
 
 import com.example.backend.dto.PlayerStateDTO;
+import com.example.backend.dto.album.AlbumPreviewDTO;
+import com.example.backend.dto.playlist.PlaylistPreviewDTO;
 import com.example.backend.dto.user.MemberProfilePreviewDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +18,7 @@ public class JamDTO {
     private boolean isPublic;
     private int size;
     private List<MemberProfilePreviewDTO> members;
-    private PlayerStateDTO playerState;
-
+    private JamTrackPreviewDTO jamTrack;
+    private PlaylistPreviewDTO currentPlaylist;
+    private AlbumPreviewDTO currentAlbum;
 }

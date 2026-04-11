@@ -1,10 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.CreateJamInvitationRequestDTO;
-import com.example.backend.dto.jam.JamParticipantRequestDTO;
-import com.example.backend.dto.jam.CreateJamSessionRequestDTO;
-import com.example.backend.dto.jam.JamPreviewDTO;
-import com.example.backend.dto.jam.UpdateJamSessionRequestDTO;
+import com.example.backend.dto.jam.*;
 import com.example.backend.service.JamParticipantService;
 import com.example.backend.service.JamSessionService;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +16,10 @@ public class JamController {
     private final JamSessionService jamSessionService;
     private final JamParticipantService jamParticipantService;
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<JamPreviewDTO> getJamSessionById(@PathVariable Long id){}
+    @GetMapping("/{id}")
+    public ResponseEntity<JamDTO> getJamSessionById(@PathVariable Long id){
+        return ResponseEntity.ok(jamSessionService.getJamSessionById(id));
+    }
 
     @PostMapping
     public ResponseEntity<JamPreviewDTO> createJamSession(@RequestBody CreateJamSessionRequestDTO dto){
