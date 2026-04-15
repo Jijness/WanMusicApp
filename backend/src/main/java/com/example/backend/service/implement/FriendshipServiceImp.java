@@ -50,7 +50,7 @@ public class FriendshipServiceImp implements FriendshipService {
         friendship.setStatus(FriendStatus.PENDING);
         friendship.setMember(currentMember);
         friendship.setFriend(friend);
-        friendship.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+        friendship.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
 
         friendshipRepo.save(friendship);
 

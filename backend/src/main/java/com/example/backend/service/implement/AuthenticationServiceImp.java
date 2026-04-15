@@ -82,7 +82,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
         Member member = new Member();
         member.setEmail(request.email());
         member.setPassword(passwordEncoder.encode(request.password()));
-        member.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+        member.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
         member.setRole(Role.USER);
         member.setSubscriptionType(SubscriptionType.FREE);
         member.setFullName(request.displayName());

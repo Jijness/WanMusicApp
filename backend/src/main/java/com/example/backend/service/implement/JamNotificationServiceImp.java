@@ -97,7 +97,7 @@ public class JamNotificationServiceImp implements JamNotificationService {
         jamNotification.setMessage(message);
         jamNotification.setJamSession(jamSession.get());
         jamNotification.setType(request.getNotificationType());
-        jamNotification.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+        jamNotification.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
 
         jamNotification = jamNotificationRepo.save(jamNotification);
 

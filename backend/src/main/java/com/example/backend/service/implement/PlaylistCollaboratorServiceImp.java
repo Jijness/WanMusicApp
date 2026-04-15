@@ -5,9 +5,12 @@ import com.example.backend.Enum.NotificationType;
 import com.example.backend.dto.CreateNotificationDTO;
 import com.example.backend.dto.UpdateCollaboratorPermissionRequestDTO;
 import com.example.backend.dto.UpdateCollaboratorRequestDTO;
+import com.example.backend.dto.user.MemberProfilePreviewDTO;
+import com.example.backend.dto.user.UserPreviewDTO;
 import com.example.backend.entity.Member;
 import com.example.backend.entity.Playlist;
 import com.example.backend.entity.PlaylistCollaborator;
+import com.example.backend.mapper.MemberMapper;
 import com.example.backend.repository.MemberRepository;
 import com.example.backend.repository.PlaylistCollaboratorRepository;
 import com.example.backend.repository.PlaylistRepository;
@@ -27,6 +30,7 @@ public class PlaylistCollaboratorServiceImp implements PlaylistCollaboratorServi
 
     private final PlaylistRepository playlistRepo;
     private final MemberRepository memberRepo;
+    private final MemberMapper memberMapper;
     private final PlaylistCollaboratorRepository playlistCollaboratorRepo;
     private final NotificationService notificationService;
     private final AuthenticationServiceImp authenticationService;
@@ -106,5 +110,13 @@ public class PlaylistCollaboratorServiceImp implements PlaylistCollaboratorServi
         }
 
         return "Remove permissions successfully!";
+    }
+
+    @Override
+    public List<MemberProfilePreviewDTO> getPlaylistColabborators(Long playlistId) {
+        return playlistCollaboratorRepo.findByPlaylist_Id(playlistId)
+                .stream()
+                .map(pc -> memberMapper.toPreviewDTO(pc.getCollaborator()))
+                .toList();
     }
 }

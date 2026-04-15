@@ -7,6 +7,8 @@ import com.example.backend.dto.album.GetAlbumsPaginationRequest;
 
 public interface AlbumService {
     PageResponse<AlbumPreviewDTO> getAlbumsByArtistId(GetAlbumsPaginationRequest request);
-    String createAlbumDraft(CreateAlbumDraftRequestDTO dto);
+    Long createAlbumDraft(CreateAlbumDraftRequestDTO dto);
     String submitAlbum(Long albumId);
+
+    PageResponse<AlbumPreviewDTO> getAllAlbums(GetAlbumsPaginationRequest request);
 }

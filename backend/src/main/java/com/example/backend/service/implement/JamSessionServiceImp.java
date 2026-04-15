@@ -2,8 +2,7 @@ package com.example.backend.service.implement;
 
 import com.example.backend.dto.jam.*;
 import com.example.backend.dto.track.TrackPreviewDTO;
-import com.example.backend.entity.JamPlayerState;
-import com.example.backend.entity.JamSession;
+import com.example.backend.entity.*;
 import com.example.backend.mapper.JamMapper;
 import com.example.backend.mapper.TrackMapper;
 import com.example.backend.repository.*;
@@ -13,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,6 +20,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JamSessionServiceImp implements JamSessionService {
 
+    private final TrackRepository trackRepo;
+    private final AlbumRepository albumRepo;
+    private final PlaylistRepository playlistRepo;
     private final JamPlayerStateRepository jamPlayerStateRepo;
     private final JamSessionRepository jamSessionRepo;
     private final JamNotificationRepository jamNotificationRepo;
@@ -30,22 +33,57 @@ public class JamSessionServiceImp implements JamSessionService {
     private final TrackMapper trackMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateJamSessionContext(UpdateJamSessionContextRequestDTO dto) {
+        try{
+            JamSession jamSession = jamSessionRepo.findById(dto.jamId()).orElseThrow(()-> new RuntimeException("Jam session not found!"));
+            if(dto.trackId() != null){
+                Track track = trackRepo.findById(dto.trackId()).orElseThrow(()-> new RuntimeException("Track not found!"));
+                jamSession.setCurrentTrack(track);
+            }
+            if(dto.albumId() != null){
+                Album album = albumRepo.findById(dto.albumId()).orElseThrow(()-> new RuntimeException("Album not found!"));
+                jamSession.setContextAlbum(album);
+            }
+            if(dto.playlistId() != null){
+                Playlist playlist = playlistRepo.findById(dto.playlistId()).orElseThrow(()-> new RuntimeException("Playlist not found!"));
+                jamSession.setContextPlaylist(playlist);
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public JamDTO getJamSessionById(Long jamSessionId) {
 
         JamSession jamSession = jamSessionRepo.findById(jamSessionId).orElseThrow(()-> new RuntimeException("Jam session not found!"));
         JamDTO jamDTO = jamMapper.toJamDTO(jamSession);
-        TrackPreviewDTO trackPreviewDTO = trackMapper.toTrackPreviewDTO(jamSession.getCurrentTrack());
-        JamTrackPreviewDTO jamTrackPreviewDTO = new JamTrackPreviewDTO(trackPreviewDTO);
+        if(jamSession.getCurrentTrack() != null){
+            TrackPreviewDTO trackPreviewDTO = trackMapper.toTrackPreviewDTO(jamSession.getCurrentTrack());
+            JamTrackPreviewDTO jamTrackPreviewDTO = new JamTrackPreviewDTO(trackPreviewDTO);
 
-        jamPlayerStateRepo.findByJamSessionId(jamSessionId).ifPresent(
-                jamPlayerState -> {
-                    jamTrackPreviewDTO.setCurrentSeekPosition(jamPlayerState.getCurrentSeekPosition());
-                    jamTrackPreviewDTO.setPlaying(jamPlayerState.isPlaying());
-                }
-        );
+            jamPlayerStateRepo.findByJamSessionId(jamSessionId).ifPresent(
+                    jamPlayerState -> {
+                        int currentSeekPosition = jamPlayerState.getCurrentSeekPosition();
 
-        jamDTO.setJamTrack(jamTrackPreviewDTO);
+                        if (jamPlayerState.isPlaying()) {
+                            long elapsedMillis = Duration.between(
+                                    jamPlayerState.getLastUpdated(),
+                                    LocalDateTime.now()
+                            ).toMillis();
+
+                            currentSeekPosition += (int) (elapsedMillis * jamPlayerState.getPlaybackRate() / 1000.0);
+                        }
+
+                        jamTrackPreviewDTO.setCurrentSeekPosition(currentSeekPosition);
+                        jamTrackPreviewDTO.setPlaying(jamPlayerState.isPlaying());
+                    }
+            );
+
+            jamDTO.setJamTrack(jamTrackPreviewDTO);
+        }
 
         return jamDTO;
     }

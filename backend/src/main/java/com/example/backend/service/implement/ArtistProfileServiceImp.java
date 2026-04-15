@@ -11,7 +11,6 @@ import com.example.backend.mapper.ArtistProfileMapper;
 import com.example.backend.repository.ArtistProfileRepository;
 import com.example.backend.repository.MemberRepository;
 import com.example.backend.service.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,7 +98,7 @@ public class ArtistProfileServiceImp implements ArtistProfileService {
         profile.setAvatarKey(dto.avatarKey());
         profile.setCoverKey(dto.coverKey());
         profile.setStatus(ArtistProfileStatus.PENDING);
-        profile.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+        profile.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
 
         artistProfileRepo.save(profile);
 

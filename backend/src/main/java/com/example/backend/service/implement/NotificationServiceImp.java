@@ -70,10 +70,12 @@ public class NotificationServiceImp implements NotificationService {
         }
 
         notification.setReceiver(receiver);
-        notification.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+        notification.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
         notification.setRead(false);
 
         notificationRepo.save(notification);
+
+        notificationDTO.setNotificationId(notification.getId());
 
         simpMessagingTemplate.convertAndSendToUser(String.valueOf(dto.getTargetId()), "/queue/notice", notificationDTO);
     }

@@ -27,6 +27,9 @@ public class JamPlayerState {
     @Column(name = "is_playing", nullable = false)
     private boolean isPlaying;
 
+    @Column(name = "playback_rate", nullable = false)
+    private float playbackRate;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "last_updated", nullable = false)
     private LocalDateTime lastUpdated;

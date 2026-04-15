@@ -1,10 +1,12 @@
 package com.example.backend.service.implement;
 
 import com.example.backend.dto.album.AddTrackToAlbumRequestDTO;
+import com.example.backend.dto.track.TrackDTO;
 import com.example.backend.entity.Album;
 import com.example.backend.entity.AlbumTrack;
 import com.example.backend.entity.EmbeddedId.AlbumTrackId;
 import com.example.backend.entity.Track;
+import com.example.backend.mapper.TrackMapper;
 import com.example.backend.repository.AlbumRepository;
 import com.example.backend.repository.AlbumTrackRepository;
 import com.example.backend.repository.TrackRepository;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,6 +24,7 @@ public class AlbumTrackServiceImp implements AlbumTrackService {
 
     private final AlbumRepository albumRepo;
     private final TrackRepository trackRepo;
+    private final TrackMapper trackMapper;
     private final AlbumTrackRepository albumTrackRepo;
 
     @Override
@@ -39,6 +43,14 @@ public class AlbumTrackServiceImp implements AlbumTrackService {
         albumTrackRepo.save(albumTrack);
 
         return albumTrack.getId();
+    }
+
+    @Override
+    public List<TrackDTO> getTracksInAlbum(Long albumId) {
+        return albumTrackRepo.findByAlbum_Id(albumId)
+                .stream()
+                .map(at -> trackMapper.toTrackDTO(at.getTrack()))
+                .toList();
     }
 
     @Override

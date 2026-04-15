@@ -7,6 +7,7 @@ public record UpdateJamPlayerRequestDTO (
         Long jamNotificationId,
         Long trackId,
         InteractionType interactionType,
-        Integer seekPosition
+        Integer seekPosition,
+        Float playbackRate
 ) {
 }

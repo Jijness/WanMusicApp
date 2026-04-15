@@ -18,6 +18,7 @@ public class JamDTO {
     private boolean isPublic;
     private int size;
     private List<MemberProfilePreviewDTO> members;
+    private MemberProfilePreviewDTO owner;
     private JamTrackPreviewDTO jamTrack;
     private PlaylistPreviewDTO currentPlaylist;
     private AlbumPreviewDTO currentAlbum;

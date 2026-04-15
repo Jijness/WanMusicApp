@@ -54,6 +54,7 @@ public class JamParticipantServiceImp implements JamParticipantService {
         JamNotificationDTO jamnotificationDTO = jamNotificationService.sendJamNotification(dto, member.getEmail());
 
         simpMessagingTemplate.convertAndSend("/jam/notification/" + jamnotificationDTO.getJamSessionId(), jamnotificationDTO);
+        simpMessagingTemplate.convertAndSend("/jam/update/" + jamnotificationDTO.getJamSessionId(), "Update");
 
         return jamSession.getId();
     }
@@ -87,9 +88,7 @@ public class JamParticipantServiceImp implements JamParticipantService {
     public Long joinJamByCode(JamParticipantRequestDTO requestDTO) {
         JamParticipant participant = new JamParticipant();
         Member member = memberRepo.findById(authenticationService.getCurrentMemberId()).get();
-        System.out.println(requestDTO.jamSessionCode());
         JamSession jamSession = jamSessionRepo.findBySessionCode(requestDTO.jamSessionCode());
-        System.out.println("SDFSDFDSF" + jamSession.getId());
         participant.setParticipant(member);
         participant.setSession(jamSession);
 

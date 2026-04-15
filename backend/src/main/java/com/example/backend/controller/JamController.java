@@ -6,6 +6,7 @@ import com.example.backend.service.JamParticipantService;
 import com.example.backend.service.JamSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,6 +42,12 @@ public class JamController {
         return ResponseEntity.ok(jamParticipantService.joinJamByCode(dto));
     }
 
+    @PutMapping("/context")
+    public ResponseEntity<Void> updateJamSessionContext(@RequestBody UpdateJamSessionContextRequestDTO dto){
+        jamSessionService.updateJamSessionContext(dto);
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/leave")
     public ResponseEntity<String> leaveJamSession(@RequestBody JamParticipantRequestDTO dto){
         return ResponseEntity.ok(jamParticipantService.leaveJam(dto));
@@ -55,4 +62,5 @@ public class JamController {
     public ResponseEntity<String> leaveJamSession(@PathVariable Long id){
         return ResponseEntity.ok(jamSessionService.deleteJamSession(id));
     }
+
 }

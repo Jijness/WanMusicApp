@@ -27,8 +27,17 @@ public class AlbumController {
         return ResponseEntity.ok(albumService.getAlbumsByArtistId(request));
     }
 
+    @GetMapping("/albums")
+    public ResponseEntity<PageResponse<AlbumPreviewDTO>> getAllAlbums(
+            @RequestParam(name = "pageNumber") int index,
+            @RequestParam(name = "pageSize") int size
+    ){
+        GetAlbumsPaginationRequest request = new GetAlbumsPaginationRequest(null, index, size);
+        return ResponseEntity.ok(albumService.getAllAlbums(request));
+    }
+
     @PostMapping("/draft")
-    public ResponseEntity<String> saveAlbumDraft(@RequestBody CreateAlbumDraftRequestDTO dto){
+    public ResponseEntity<Long> saveAlbumDraft(@RequestBody CreateAlbumDraftRequestDTO dto){
         return ResponseEntity.ok(albumService.createAlbumDraft(dto));
     }
 

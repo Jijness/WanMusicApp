@@ -16,10 +16,11 @@ import com.example.backend.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Optional;
 
 @Service
@@ -40,12 +41,13 @@ public class AlbumServiceImp implements AlbumService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String createAlbumDraft(CreateAlbumDraftRequestDTO dto) {
+    public Long createAlbumDraft(CreateAlbumDraftRequestDTO dto) {
         Album album = new Album();
 
         Long currentMemberId = authenticationService.getCurrentMemberId();
         ArtistProfile artistProfile = artistProfileRepo.findByMemberId(currentMemberId).orElseThrow(()-> new RuntimeException("Artist profile not found!"));
 
+        album.setReleaseDate(LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh")));
         album.setTitle(dto.title());
         album.setArtist(artistProfile);
         album.setStatus(AlbumStatus.DRAFT);
@@ -53,7 +55,7 @@ public class AlbumServiceImp implements AlbumService {
 
         albumRepo.save(album);
 
-        return "Created album draft successfully!";
+        return album.getId();
     }
 
     @Override
@@ -69,5 +71,10 @@ public class AlbumServiceImp implements AlbumService {
         return "Submitted album successfully!";
     }
 
+    @Override
+    public PageResponse<AlbumPreviewDTO> getAllAlbums(GetAlbumsPaginationRequest request) {
+        Page<Album> albums = albumRepo.findAll(PageRequest.of(request.index() - 1, request.size()));
+        return pageMapper.toPageResponse(albums, albumMapper::toAlbumPreviewDTO);
+    }
 
 }

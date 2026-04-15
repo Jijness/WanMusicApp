@@ -70,7 +70,7 @@ public class TrackServiceImp implements TrackService {
         track.setThumbnailKey(dto.thumbnailKey());
         track.setDuration(dto.duration());
         track.setStatus(TrackStatus.DRAFT);
-        track.setCreatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+        track.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
 
         trackRepo.save(track);
 

@@ -30,10 +30,11 @@ public class JamPlayerStateServiceImp implements JamPlayerStateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateJamPlayerState(Long jamSessionId, int currentSeekPosition, boolean isPlaying) {
+    public void updateJamPlayerState(Long jamSessionId, int currentSeekPosition, boolean isPlaying, float playbackRate) {
         JamPlayerState jamPlayerState = jamPlayerStateRepo.findByJamSessionId(jamSessionId).orElseThrow(() -> new RuntimeException("JamState not found!"));
         jamPlayerState.setCurrentSeekPosition(currentSeekPosition);
         jamPlayerState.setPlaying(isPlaying);
+        jamPlayerState.setPlaybackRate(playbackRate);
         jamPlayerState.setLastUpdated(LocalDateTime.now());
     }
 
@@ -90,7 +91,7 @@ public class JamPlayerStateServiceImp implements JamPlayerStateService {
         jamTrack.setCurrentSeekPosition(currentSeekPosition);
         jamTrack.setPlaying(isPlaying);
 
-        updateJamPlayerState(dto.jamId(), currentSeekPosition, isPlaying);
+        updateJamPlayerState(dto.jamId(), currentSeekPosition, isPlaying, dto.playbackRate());
 
         simpMessagingTemplate.convertAndSend("/jam/notification/" + dto.jamId(), notificationResponse);
         simpMessagingTemplate.convertAndSend("/jam/track/" + dto.jamId(), jamTrack);

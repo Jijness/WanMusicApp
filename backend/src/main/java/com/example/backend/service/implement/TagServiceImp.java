@@ -21,7 +21,8 @@ public class TagServiceImp implements TagService {
     private final TagMapper tagMapper;
 
     @Override
-    public String createTag(CreateTagRequestDTO dto) {
+    @Transactional(rollbackFor = Exception.class)
+    public TagDTO createTag(CreateTagRequestDTO dto) {
         Tag tag = new Tag();
         Optional<Tag> parentTag = tagRepo.findById(dto.parentTagId());
 
@@ -31,7 +32,9 @@ public class TagServiceImp implements TagService {
         tag.setDisplayName(dto.displayName());
         tag.setDescription(dto.description());
 
-        return "Tag created successfully!";
+        tagRepo.save(tag);
+
+        return tagMapper.toDTO(tag);
     }
 
     @Override

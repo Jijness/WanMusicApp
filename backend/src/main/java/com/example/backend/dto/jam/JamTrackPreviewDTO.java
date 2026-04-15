@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class JamTrackPreviewDTO extends TrackPreviewDTO {
     private int currentSeekPosition;
+    private float playbackRate;
     private boolean isPlaying;
 
     public JamTrackPreviewDTO(TrackPreviewDTO trackPreviewDTO) {
